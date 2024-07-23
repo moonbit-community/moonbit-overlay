@@ -20,7 +20,7 @@
         inputs.devshell.flakeModule
       ];
 
-      perSystem = { inputs', system, pkgs, lib, ... }: {
+      perSystem = { inputs', system, pkgs, ... }: {
         _module.args.pkgs = import inputs.nixpkgs {
           inherit system;
           overlays = [ inputs.moonbit-overlay.overlays.default ];
