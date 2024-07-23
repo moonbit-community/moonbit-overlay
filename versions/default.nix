@@ -1,0 +1,3 @@
+{
+  "latest" = import ./latest.nix;
+}
