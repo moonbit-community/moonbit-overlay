@@ -23,7 +23,7 @@
 
       packages = forEachSystem (system:
         mkMoonbitBin nixpkgs.legacyPackages.${system}
-        // { default = self.packages.${system}.moonbit-bin; }
+        // { default = self.packages.${system}.moonbit.latest; }
       );
     };
 }
