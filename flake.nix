@@ -10,7 +10,7 @@
 
       overlay = import ./.;
 
-      versions = import ./versions;
+      versions = import ./versions lib.importJSON;
       mkMoonbitBin = pkgs: import ./lib/moonbit-bin.nix {
         inherit lib pkgs versions;
       };

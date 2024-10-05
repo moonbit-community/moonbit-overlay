@@ -1,3 +1,5 @@
+read:
+
 {
-  "latest" = import ./latest.nix;
+  latest = read ./latest.json;
 }
