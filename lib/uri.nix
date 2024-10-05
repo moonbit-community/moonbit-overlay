@@ -1,1 +1,0 @@
-"https://cli.moonbitlang.com"

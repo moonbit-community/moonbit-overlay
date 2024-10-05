@@ -5,11 +5,12 @@
 
 # TODO: overridable
 #       unbound version
+#       difference target
 
 let
   inherit (pkgs) stdenv callPackage;
 
-  cliMoonbit = import ./uri.nix;
+  cliMoonbit = builtins.readFile ./uri.txt;
   # x86_64-linux => linux-x86_64
   target = with lib; concatStringsSep "-" (reverseList (splitString "-" stdenv.system));
 
