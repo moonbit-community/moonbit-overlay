@@ -25,5 +25,27 @@
         mkMoonbitBin nixpkgs.legacyPackages.${system}
         // { default = self.packages.${system}.moonbit.latest; }
       );
+
+      apps = forEachSystem (system:
+        let
+          getMoonbit = lib.getExe' self.packages.${system}.default;
+          mkMoonbitApp = name: {
+            type = "app";
+            program = getMoonbit name;
+          };
+        in
+        {
+          default = self.apps.${system}.moon;
+        } // (lib.genAttrs [
+          "moon"
+          "moonc"
+          "mooncake"
+          "moon_cove_report"
+          "moondoc"
+          "moonfmt"
+          "mooninfo"
+          "moonrrun"
+        ]
+          mkMoonbitApp));
     };
 }
