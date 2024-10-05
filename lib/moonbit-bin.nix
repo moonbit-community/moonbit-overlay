@@ -10,7 +10,7 @@
 let
   inherit (pkgs) stdenv callPackage;
 
-  cliMoonbit = builtins.readFile ./uri.txt;
+  cliMoonbit = builtins.readFile ../uri.txt;
   # x86_64-linux => linux-x86_64
   target = with lib; concatStringsSep "-" (reverseList (splitString "-" stdenv.system));
 
