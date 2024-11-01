@@ -10,9 +10,11 @@ let
   inherit (pkgs) stdenv callPackage;
 
   moonbitUri = lib.fileContents ../uri.txt;
-
-  mkCliUri = version: "${cliMoonbit}/binaries/${version}/moonbit-${target}.tar.gz";
-  mkCoreUri = version: "${cliMoonbit}/cores/core-${version}.tar.gz";
+  target = {
+    "x86_64-linux" = "linux-x86_64";
+    "x86_64-darwin" = "darwin-x86_64";
+    "aarch64-darwin" = "darwin-aarch64";
+  }.${stdenv.hostPlatform.system} or (throw "Unsupported platform: ${stdenv.hostPlatform.system}");
 
   mkVersion = v: lib.escapeURL (lib.removePrefix "v" v);
   mkCliUri = version: "${moonbitUri}/binaries/${mkVersion version}/moonbit-${target}.tar.gz";
