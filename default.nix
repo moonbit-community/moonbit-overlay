@@ -8,6 +8,6 @@ in
     import ./lib/moonbit-bin.nix {
       inherit lib;
       pkgs = final;
-      versions = import ./versions lib.importJSON;
+      versions = import ./versions.nix lib;
     };
 }

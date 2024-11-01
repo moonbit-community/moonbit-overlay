@@ -4,36 +4,46 @@
 }:
 
 # TODO: overridable
-#       unbound version
-#       difference target
+#       build from source
 
 let
   inherit (pkgs) stdenv callPackage;
 
-  cliMoonbit = lib.fileContents ../uri.txt;
-  # x86_64-linux => linux-x86_64
-  target = with lib; concatStringsSep "-" (reverseList (splitString "-" stdenv.system));
+  moonbitUri = lib.fileContents ../uri.txt;
 
   mkCliUri = version: "${cliMoonbit}/binaries/${version}/moonbit-${target}.tar.gz";
   mkCoreUri = version: "${cliMoonbit}/cores/core-${version}.tar.gz";
 
-  mk = version: hashes: rec {
-    cli.${version} = callPackage ./cli.nix {
-      inherit version;
-      url = mkCliUri version;
-      hash = hashes.cliHash;
-    };
-    core.${version} = callPackage ./core.nix {
-      inherit version;
-      url = mkCoreUri version;
-      hash = hashes.coreHash;
-    };
+  mkVersion = v: lib.escapeURL (lib.removePrefix "v" v);
+  mkCliUri = version: "${moonbitUri}/binaries/${mkVersion version}/moonbit-${target}.tar.gz";
+  mkCoreUri = version: "${moonbitUri}/cores/core-${mkVersion version}.tar.gz";
 
-    moonbit.${version} = callPackage ./bundle.nix {
-      cli = cli."${version}";
-      core = core."${version}";
+  mk = _: record:
+    let
+      escapeFrom = [ "." "+" ];
+      escapeTo = [ "_" "-" ];
+      escape = builtins.replaceStrings escapeFrom escapeTo;
+
+      version = record.version;
+      escapedVersion = escape version;
+    in
+    rec {
+      cli.${escapedVersion} = callPackage ./cli.nix {
+        inherit version;
+        url = mkCliUri version;
+        hash = record.cliHash;
+      };
+      core.${escapedVersion} = callPackage ./core.nix {
+        inherit version;
+        url = mkCoreUri version;
+        hash = record.coreHash;
+      };
+
+      moonbit.${escapedVersion} = callPackage ./bundle.nix {
+        cli = cli."${escapedVersion}";
+        core = core."${escapedVersion}";
+      };
     };
-  };
 in
 builtins.foldl' lib.recursiveUpdate { }
   (builtins.attrValues (lib.mapAttrs mk versions))
