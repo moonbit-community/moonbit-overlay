@@ -26,6 +26,11 @@ sed -i "s|coreHash\": \"sha256-.*\"|coreHash\": \"sha256-$core_hash\"|" $latest_
 if ! git diff --exit-code $latest_file; then
   version=$(nix run .\#moonc -- -v 2> /dev/null)
   echo -e "\e[0;36mcurrent version: \e[1;36m$version\e[0m" > /dev/stderr
+
+  # update latest
+  sed -i "s|version\": \".*\"|version\": \"$version\"|" $latest_file
+  # pin
   cp $latest_file "$version_dir/$version.json"
-  sed -i "s|version\": \"latest|version\": \"$version|" "$version_dir/$version.json"
 fi
+
+echo done
