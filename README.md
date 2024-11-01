@@ -8,7 +8,7 @@ Binary distributed [moonbit](https://www.moonbitlang.com/) toolchains.
 - versioning!
 - patchelf works :)
 
-## TODO:
+## TODO
 - [ ] overridable
 - [ ] build from source (core)
 
