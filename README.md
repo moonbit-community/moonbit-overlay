@@ -55,5 +55,22 @@ Binary distributed [moonbit](https://www.moonbitlang.com/) toolchains.
 }
 ```
 
+## Version
+
+### latest
+```nix
+moonbit-bin.moonbit.latest
+```
+
+### specific version
+```nix
+moonbit-bin.moonbit.v0_1_20241031-7204facb6
+```
+Check available versions in directory [versions/].
+
+> The original version of moonbit is written as `v0.1.20241031+7204facb6`,
+> for convenience, we [escape](https://github.com/jetjinser/moonbit-overlay/blob/3464a68cf9a16d4d63f76de823ca9687bca2de2d/lib/moonbit-bin.nix#L22-L24)
+> it to format like `v0_1_20241031-7204facb6`.
+
 ## Inspiration
 the moonbit-overlay is inspired by [rust-overlay](https://github.com/oxalica/rust-overlay).
