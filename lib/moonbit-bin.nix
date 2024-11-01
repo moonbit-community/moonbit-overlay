@@ -17,30 +17,30 @@ let
   mkCliUri = version: "${moonbitUri}/binaries/${mkVersion version}/moonbit-${target}.tar.gz";
   mkCoreUri = version: "${moonbitUri}/cores/core-${mkVersion version}.tar.gz";
 
-  mk = _: record:
+  mk = ref: record:
     let
       escapeFrom = [ "." "+" ];
       escapeTo = [ "_" "-" ];
       escape = builtins.replaceStrings escapeFrom escapeTo;
 
       version = record.version;
-      escapedVersion = escape version;
+      escapedRef = escape ref;
     in
     rec {
-      cli.${escapedVersion} = callPackage ./cli.nix {
+      cli.${escapedRef} = callPackage ./cli.nix {
         inherit version;
         url = mkCliUri version;
         hash = record.cliHash;
       };
-      core.${escapedVersion} = callPackage ./core.nix {
+      core.${escapedRef} = callPackage ./core.nix {
         inherit version;
         url = mkCoreUri version;
         hash = record.coreHash;
       };
 
-      moonbit.${escapedVersion} = callPackage ./bundle.nix {
-        cli = cli."${escapedVersion}";
-        core = core."${escapedVersion}";
+      moonbit.${escapedRef} = callPackage ./bundle.nix {
+        cli = cli."${escapedRef}";
+        core = core."${escapedRef}";
       };
     };
 in
