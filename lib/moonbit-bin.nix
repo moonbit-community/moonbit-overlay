@@ -3,9 +3,6 @@
 , versions
 }:
 
-# TODO: overridable
-#       build from source
-
 let
   inherit (pkgs) stdenv callPackage;
 

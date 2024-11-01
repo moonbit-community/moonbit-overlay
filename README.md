@@ -2,11 +2,15 @@
 
 Binary distributed [moonbit](https://www.moonbitlang.com/) toolchains.
 
-Features:
-  - the hard bound between [moon](https://github.com/moonbitlang/moon/) and [core](https://github.com/moonbitlang/core).
-  - not build from source.
-  - non-reproducible due to [non-versioning](https://github.com/moonbitlang/moonbit-docs/issues/131).
-  - patchelf works :)
+## Features
+- the hard bound between [moon](https://github.com/moonbitlang/moon/) and [core](https://github.com/moonbitlang/core).
+- not build from source.
+- versioning!
+- patchelf works :)
+
+## TODO:
+- [ ] overridable
+- [ ] build from source (core)
 
 ## Example
 
