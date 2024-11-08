@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-version_dir="./versions"
-latest_file="./versions/latest.json"
+version_dir="./versions/toolchains"
+latest_file="./versions/toolchains/latest.json"
 
 fetch-sha256() {
   uri="$1"
