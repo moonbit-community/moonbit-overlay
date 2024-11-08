@@ -10,7 +10,8 @@ Binary distributed [moonbit](https://www.moonbitlang.com/) toolchains.
 
 ## TODO
 - [ ] overridable
-- [ ] build from source (core)
+- [x] build from source (core)
+- [ ] re-support legacy default.nix
 
 ## Example
 
