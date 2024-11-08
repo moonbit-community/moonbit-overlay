@@ -1,18 +1,35 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    core = {
+      url = "github:moonbitlang/core";
+      flake = false;
+    };
   };
 
-  outputs = { self, nixpkgs }:
+  outputs = { self, nixpkgs, core }:
     let
       inherit (nixpkgs) lib;
       forEachSystem = lib.genAttrs lib.systems.flakeExposed;
 
-      overlay = import ./.;
+      overlay = (final: prev:
+        let
+          inherit (final) lib;
+        in
+        {
+          moonbit-bin = (prev.moonbit-bin or { }) //
+            import ./lib/moonbit-bin.nix {
+              inherit lib;
+              pkgs = final;
+              versions = import ./versions.nix lib;
+              coreSrc = core;
+            };
+        });
 
       versions = import ./versions.nix lib;
       mkMoonbitBin = pkgs: import ./lib/moonbit-bin.nix {
         inherit lib pkgs versions;
+        coreSrc = core;
       };
     in
     {

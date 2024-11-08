@@ -16,6 +16,7 @@ symlinkJoin {
 
   postBuild = ''
     export MOON_HOME=$out
+
     PATH=$out/bin $out/bin/${cli.meta.mainProgram} bundle --all --source-dir $out/lib/core
 
     wrapProgram $out/bin/${cli.meta.mainProgram} \

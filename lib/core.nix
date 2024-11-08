@@ -1,27 +1,21 @@
 { stdenv
-, fetchurl
   # manually
-, version
-, url
-, hash
+, coreSrc
 , ...
 }:
 
 stdenv.mkDerivation {
   pname = "moonbit-core";
-  inherit version;
+  version = coreSrc.shortRev;
 
-  src = fetchurl {
-    inherit url;
-    inherit hash;
-  };
+  src = coreSrc;
 
   sourceRoot = ".";
 
   installPhase = ''
     runHook preInstall
-    mkdir -p $out/lib
-    cp -r core $out/lib
+    mkdir -p $out/lib/core
+    cp -r ./source/* $out/lib/core
     runHook postInstall
   '';
 }

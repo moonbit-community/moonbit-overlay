@@ -22,7 +22,6 @@ core_hash=$(fetch-sha256 $core_uri)
 
 sed -i "s|version\": \".*\"|version\": \"latest\"|" $latest_file
 sed -i "s|cliHash\": \"sha256-.*\"|cliHash\": \"sha256-$cli_hash\"|" $latest_file
-sed -i "s|coreHash\": \"sha256-.*\"|coreHash\": \"sha256-$core_hash\"|" $latest_file
 
 if ! git diff --exit-code $latest_file; then
   version=$(nix run .\#moonc -- -v)

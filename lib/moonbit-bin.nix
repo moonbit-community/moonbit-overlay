@@ -1,6 +1,7 @@
 { lib
 , pkgs
 , versions
+, coreSrc
 }:
 
 let
@@ -15,7 +16,6 @@ let
 
   mkVersion = v: lib.escapeURL (lib.removePrefix "v" v);
   mkCliUri = version: "${moonbitUri}/binaries/${mkVersion version}/moonbit-${target}.tar.gz";
-  mkCoreUri = version: "${moonbitUri}/cores/core-${mkVersion version}.tar.gz";
 
   mk = ref: record:
     let
@@ -33,8 +33,7 @@ let
         hash = record.cliHash;
       };
       core.${escapedRef} = callPackage ./core.nix {
-        inherit version;
-        url = mkCoreUri version;
+        inherit version coreSrc;
         hash = record.coreHash;
       };
 
