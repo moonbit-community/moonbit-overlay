@@ -25,7 +25,11 @@ sed -i "s|cliHash\": \"sha256-.*\"|cliHash\": \"sha256-$cli_hash\"|" $latest_fil
 sed -i "s|coreHash\": \"sha256-.*\"|coreHash\": \"sha256-$core_hash\"|" $latest_file
 
 if ! git diff --exit-code $latest_file; then
-  version=$(nix run .\#moonc -- -v 2> /dev/null)
+  version=$(nix run .\#moonc -- -v)
+  if [ -z "${version}" ]; then
+    echo -e "error: failed get version from moonc" > /dev/stderr
+    exit 1
+  fi
   echo -e "\e[0;36mcurrent version: \e[1;36m$version\e[0m" > /dev/stderr
 
   # update latest
