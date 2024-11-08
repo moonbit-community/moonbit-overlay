@@ -20,6 +20,7 @@ core_uri="$uri/cores/core-latest.tar.gz";
 cli_hash=$(fetch-sha256 $cli_uri)
 core_hash=$(fetch-sha256 $core_uri)
 
+sed -i "s|version\": \".*\"|version\": \"latest\"|" $latest_file
 sed -i "s|cliHash\": \"sha256-.*\"|cliHash\": \"sha256-$cli_hash\"|" $latest_file
 sed -i "s|coreHash\": \"sha256-.*\"|coreHash\": \"sha256-$core_hash\"|" $latest_file
 
