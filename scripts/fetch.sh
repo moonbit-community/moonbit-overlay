@@ -15,10 +15,8 @@ fetch-sha256() {
 
 uri=$(cat ./uri.txt)
 cli_uri="$uri/binaries/latest/moonbit-linux-x86_64.tar.gz"
-core_uri="$uri/cores/core-latest.tar.gz";
 
 cli_hash=$(fetch-sha256 $cli_uri)
-core_hash=$(fetch-sha256 $core_uri)
 
 sed -i "s|version\": \".*\"|version\": \"latest\"|" $latest_file
 sed -i "s|cliHash\": \"sha256-.*\"|cliHash\": \"sha256-$cli_hash\"|" $latest_file
