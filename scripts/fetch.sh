@@ -13,6 +13,8 @@ fetch-sha256() {
   echo "$hash"
 }
 
+# phase 0
+
 uri=$(cat ./uri.txt)
 cli_uri="$uri/binaries/latest/moonbit-linux-x86_64.tar.gz"
 
@@ -20,6 +22,8 @@ cli_hash=$(fetch-sha256 $cli_uri)
 
 sed -i "s|version\": \".*\"|version\": \"latest\"|" $latest_file
 sed -i "s|cliHash\": \"sha256-.*\"|cliHash\": \"sha256-$cli_hash\"|" $latest_file
+
+# phase 1
 
 if ! git diff --exit-code $latest_file; then
   version=$(nix run .\#moonc -- -v)
@@ -31,6 +35,15 @@ if ! git diff --exit-code $latest_file; then
 
   # update latest
   sed -i "s|version\": \".*\"|version\": \"$version\"|" $latest_file
+  # re-fetch
+  # NOTE: uri 'latest/moonbit.tar.gz' and
+  #       uri '(latest moonc -v)/moonbit.tar.gz' are not same
+  escaped_version=${version:1}
+  escaped_version=${escaped_version//+/%2B}
+  cli_uri="$uri/binaries/$escaped_version/moonbit-linux-x86_64.tar.gz"
+  echo -e "\e[0;36mre-fetching\e[0m..." > /dev/stderr
+  cli_hash=$(fetch-sha256 $cli_uri)
+  sed -i "s|cliHash\": \"sha256-.*\"|cliHash\": \"sha256-$cli_hash\"|" $latest_file
   # pin
   cp $latest_file "$version_dir/$version.json"
 fi
