@@ -2,18 +2,34 @@
 
 Binary distributed [moonbit](https://www.moonbitlang.com/) toolchains.
 
+## Quick Start
+
+Run [moon](https://github.com/moonbitlang/moon) in one line:
+```nix
+nix run github:jetjinser/moonbit-overlay#moon
+```
+
+List all available binaries:
+```nix
+nix run github:jetjinser/moonbit-overlay#<tab>
+```
+
 ## Features
 - the hard bound between [moon](https://github.com/moonbitlang/moon/) and [core](https://github.com/moonbitlang/core).
 - not build from source.
 - versioning!
 - patchelf works :)
+- LSP!
 
 ## TODO
 - [ ] overridable
 - [x] build from source (core)
 - [ ] re-support legacy default.nix
 
+
 ## Example
+
+### flake with overlay
 
 ```nix
 {
@@ -53,6 +69,18 @@ Binary distributed [moonbit](https://www.moonbitlang.com/) toolchains.
       ];
     };
 }
+```
+
+## Bundled MoonBit Toolchains
+
+```nix
+moonbit-bin.moonbit.latest
+```
+
+## MoonBit LSP (extracted from [moonbit-lang vscode extention](https://marketplace.visualstudio.com/items?itemName=moonbit.moonbit-lang))
+
+```nix
+moonbit-bin.lsp.latest
 ```
 
 ## Version
