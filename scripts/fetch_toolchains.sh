@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-version_dir="./versions/toolchains"
-latest_file="./versions/toolchains/latest.json"
+toolchains_dir="./versions/toolchains"
+latest_file="$toolchains_dir/latest.json"
 
 fetch-sha256() {
   uri="$1"
@@ -45,7 +45,7 @@ if ! git diff --exit-code $latest_file; then
   cli_hash=$(fetch-sha256 $cli_uri)
   sed -i "s|cliHash\": \"sha256-.*\"|cliHash\": \"sha256-$cli_hash\"|" $latest_file
   # pin
-  cp $latest_file "$version_dir/$version.json"
+  cp $latest_file "$toolchains_dir/$version.json"
 fi
 
-echo done
+echo done > /dev/stderr

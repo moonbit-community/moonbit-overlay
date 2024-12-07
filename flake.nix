@@ -23,6 +23,11 @@
               pkgs = final;
               versions = import ./versions.nix lib;
               coreSrc = core;
+            } //
+            import ./lib/lsp.nix {
+              inherit lib;
+              inherit (final) moonbit-bin;
+              pkgs = final;
             };
         });
 
@@ -30,6 +35,9 @@
       mkMoonbitBin = pkgs: import ./lib/moonbit-bin.nix {
         inherit lib pkgs versions;
         coreSrc = core;
+      };
+      mkMoonbitLsp = pkgs: moonbit-bin: import ./lib/lsp.nix {
+        inherit lib pkgs moonbit-bin;
       };
     in
     {
@@ -39,8 +47,12 @@
       };
 
       packages = forEachSystem (system:
-        mkMoonbitBin nixpkgs.legacyPackages.${system}
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        mkMoonbitBin pkgs
         // { default = self.packages.${system}.moonbit.latest; }
+        // mkMoonbitLsp pkgs self.packages.${system}
       );
 
       apps = forEachSystem (system:
