@@ -1,6 +1,6 @@
 # moonbit-overlay
 
-Binary distributed [moonbit](https://www.moonbitlang.com/) toolchains.
+Binary distributed [MoonBit](https://www.moonbitlang.com/) toolchains.
 
 ## Quick Start
 
@@ -33,7 +33,7 @@ nix run github:jetjinser/moonbit-overlay#<tab>
 
 ```nix
 {
-  description = "A startup basic moonbit project";
+  description = "A startup basic MoonBit project";
 
   inputs = {
     flake-parts.url = "github:hercules-ci/flake-parts";
@@ -97,7 +97,7 @@ moonbit-bin.moonbit.v0_1_20241031-7204facb6
 ```
 Check available versions in the [directory](versions/).
 
-> The original version of moonbit is written as `v0.1.20241031+7204facb6`,
+> The original version of MoonBit is written as `v0.1.20241031+7204facb6`,
 > for convenience, we [escape](https://github.com/jetjinser/moonbit-overlay/blob/3464a68cf9a16d4d63f76de823ca9687bca2de2d/lib/moonbit-bin.nix#L22-L24)
 > it to format like `v0_1_20241031-7204facb6`.
 
