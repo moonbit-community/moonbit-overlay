@@ -19,11 +19,6 @@ nix run github:jetjinser/moonbit-overlay#<tab>
 - versioning!
 - patchelf works :)
 
-## TODO
-- [ ] overridable
-- [x] build from source (core)
-- [ ] re-support legacy default.nix
-
 
 ## Example
 
@@ -98,6 +93,12 @@ Check available versions in the [directory](versions/).
 > The original version of MoonBit is written as `v0.1.20241031+7204facb6`,
 > for convenience, we [escape](https://github.com/jetjinser/moonbit-overlay/blob/3464a68cf9a16d4d63f76de823ca9687bca2de2d/lib/moonbit-bin.nix#L22-L24)
 > it to format like `v0_1_20241031-7204facb6`.
+
+## TODO
+- [ ] overridable
+- [x] build from source (core)
+- [ ] re-support legacy default.nix
+
 
 ## Inspiration
 the moonbit-overlay is inspired by [rust-overlay](https://github.com/oxalica/rust-overlay).
