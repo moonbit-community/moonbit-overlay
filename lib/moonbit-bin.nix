@@ -7,7 +7,7 @@
 let
   inherit (pkgs) stdenv callPackage;
 
-  moonbitUri = lib.fileContents ../uri.txt;
+  moonbitUri = "https://cli.moonbitlang.com";
   target = {
     "x86_64-linux" = "linux-x86_64";
     "x86_64-darwin" = "darwin-x86_64";

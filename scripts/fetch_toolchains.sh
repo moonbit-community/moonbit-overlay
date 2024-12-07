@@ -15,7 +15,7 @@ fetch-sha256() {
 
 # phase 0
 
-uri=$(cat ./uri.txt)
+uri="https://cli.moonbitlang.com"
 cli_uri="$uri/binaries/latest/moonbit-linux-x86_64.tar.gz"
 
 cli_hash=$(fetch-sha256 $cli_uri)
