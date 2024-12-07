@@ -58,6 +58,7 @@ nix run github:jetjinser/moonbit-overlay#<tab>
         devshells.default = {
             packages = with pkgs; [
               moonbit-bin.moonbit.latest
+              moonbit-bin.lsp.latest
             ];
           };
       };
