@@ -15,11 +15,9 @@ nix run github:jetjinser/moonbit-overlay#<tab>
 ```
 
 ## Features
-- the hard bound between [moon](https://github.com/moonbitlang/moon/) and [core](https://github.com/moonbitlang/core).
-- not build from source.
+- build from source in future.
 - versioning!
 - patchelf works :)
-- LSP!
 
 ## TODO
 - [ ] overridable
