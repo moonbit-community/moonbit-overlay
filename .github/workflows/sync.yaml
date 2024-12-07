@@ -27,7 +27,11 @@ jobs:
 
     - name: Prefetch latest MoonBit
       timeout-minutes: 5
-      run: ./scripts/fetch.sh
+      run: ./scripts/fetch_toolchains.sh
+
+    - name: Prefetch latest vscode extension moonbit-lang
+      timeout-minutes: 5
+      run: ./scripts/fetch_extension.sh
 
     - name: Check and commit changes
       id: commit
