@@ -76,5 +76,13 @@
           "moonrrun"
         ]
           mkMoonbitApp));
+
+      templates = rec {
+        default = moonbit-dev;
+        moonbit-dev = {
+          path = ./mmoonbit-dev;
+          description = "A startup basic MoonBit project";
+        };
+      };
     };
 }
