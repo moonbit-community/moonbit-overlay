@@ -4,26 +4,29 @@ Binary distributed [MoonBit](https://www.moonbitlang.com/) toolchains.
 
 ## Quick Start
 
-### Run [moon](https://github.com/moonbitlang/moon) in one line:
+### Run [moon](https://github.com/moonbitlang/moon) in one line
+
 ```nix
 nix run github:jetjinser/moonbit-overlay#moon
 ```
 
-### List all available binaries:
+### List all available binaries
+
 ```nix
 nix run github:jetjinser/moonbit-overlay#<tab>
 ```
 
-### Create devshell from template:
+### Create devshell from template
+
 ```bash
 nix flake init -t github:jetjinser/moonbit-overlay
 ```
 
 ## Features
+
 - build from source in future.
 - versioning!
 - patchelf works :)
-
 
 ## Example
 
@@ -85,14 +88,17 @@ moonbit-bin.lsp.latest
 ## Version
 
 ### latest
+
 ```nix
 moonbit-bin.moonbit.latest
 ```
 
 ### specific version
+
 ```nix
 moonbit-bin.moonbit.v0_1_20241031-7204facb6
 ```
+
 Check available versions in the [directory](versions/).
 
 > The original version of MoonBit is written as `v0.1.20241031+7204facb6`,
@@ -100,10 +106,12 @@ Check available versions in the [directory](versions/).
 > it to format like `v0_1_20241031-7204facb6`.
 
 ## TODO
+
 - [ ] overridable
 - [x] build from source (core)
 - [ ] re-support legacy default.nix
 
-
 ## Inspiration
+
 The moonbit-overlay is heavily inspired by [rust-overlay](https://github.com/oxalica/rust-overlay).
+
