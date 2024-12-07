@@ -4,14 +4,19 @@ Binary distributed [MoonBit](https://www.moonbitlang.com/) toolchains.
 
 ## Quick Start
 
-Run [moon](https://github.com/moonbitlang/moon) in one line:
+### Run [moon](https://github.com/moonbitlang/moon) in one line:
 ```nix
 nix run github:jetjinser/moonbit-overlay#moon
 ```
 
-List all available binaries:
+### List all available binaries:
 ```nix
 nix run github:jetjinser/moonbit-overlay#<tab>
+```
+
+### Create devshell from template:
+```bash
+nix flake init -t github:jetjinser/moonbit-overlay
 ```
 
 ## Features
