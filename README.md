@@ -106,4 +106,4 @@ Check available versions in the [directory](versions/).
 
 
 ## Inspiration
-the moonbit-overlay is inspired by [rust-overlay](https://github.com/oxalica/rust-overlay).
+The moonbit-overlay is heavily inspired by [rust-overlay](https://github.com/oxalica/rust-overlay).
