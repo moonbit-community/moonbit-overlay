@@ -80,7 +80,7 @@
       templates = rec {
         default = moonbit-dev;
         moonbit-dev = {
-          path = ./mmoonbit-dev;
+          path = ./moonbit-dev;
           description = "A startup basic MoonBit project";
         };
       };
