@@ -79,7 +79,7 @@ nix flake init -t github:jetjinser/moonbit-overlay
 moonbit-bin.moonbit.latest
 ```
 
-## MoonBit LSP (extracted from [moonbit-lang vscode extention](https://marketplace.visualstudio.com/items?itemName=moonbit.moonbit-lang))
+## MoonBit LSP (extracted from [moonbit-lang vscode extension](https://marketplace.visualstudio.com/items?itemName=moonbit.moonbit-lang))
 
 ```nix
 moonbit-bin.lsp.latest
