@@ -6,13 +6,13 @@ Binary distributed [MoonBit](https://www.moonbitlang.com/) toolchains.
 
 ### Run [moon](https://github.com/moonbitlang/moon) in one line
 
-```nix
+```bash
 nix run github:jetjinser/moonbit-overlay#moon
 ```
 
 ### List all available binaries
 
-```nix
+```bash
 nix run github:jetjinser/moonbit-overlay#<tab>
 ```
 
