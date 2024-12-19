@@ -29,9 +29,7 @@
               inherit (final) moonbit-bin;
               pkgs = final;
             };
-          moonbit = (prev.moonbit or { }) // {
-            moonbit-lang = final.callPackage ./lib/compiler.nix { };
-          };
+          moonbit-lang = final.callPackage ./lib/compiler.nix { };
         });
 
       versions = import ./versions.nix lib;
