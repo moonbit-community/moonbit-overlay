@@ -53,6 +53,9 @@
         mkMoonbitBin pkgs
         // { default = self.packages.${system}.moonbit.latest; }
         // mkMoonbitLsp pkgs self.packages.${system}
+        // {
+          compiler = pkgs.callPackage ./lib/compiler.nix { };
+        }
       );
 
       apps = forEachSystem (system:
