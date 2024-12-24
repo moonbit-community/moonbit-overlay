@@ -2,6 +2,8 @@
 
 Binary distributed [MoonBit](https://www.moonbitlang.com/) toolchains.
 
+NOTE: [moonbit-compiler](https://github.com/moonbitlang/moonbit-compiler) was already open sourced, BUT *only* wasm-gc backend is available. Considering this is an incomplete compiler and the version is quite lagging, this project will still only be able to use patched pre-built binaries for a long time.
+
 ## Quick Start
 
 ### Run [moon](https://github.com/moonbitlang/moon) in one line
