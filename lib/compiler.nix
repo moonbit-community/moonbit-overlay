@@ -1,11 +1,15 @@
 { lib
 , fetchFromGitHub
 , ocamlPackages
+, ocaml
 }:
 
 ocamlPackages.buildDunePackage {
   pname = "moonbit-lang";
-  version = "unstable-2024-12-18";
+  version = "v0.1.20241202+8756d160d";
+
+  minimalOCamlVersion = "4.14.2";
+  doCheck = lib.versionAtLeast ocaml.version "4.05";
 
   src = fetchFromGitHub {
     owner = "moonbitlang";
