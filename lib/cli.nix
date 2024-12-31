@@ -1,13 +1,14 @@
-{ stdenv
-, lib
-, fetchurl
-, autoPatchelfHook
-, libgcc
+{
+  stdenv,
+  lib,
+  fetchurl,
+  autoPatchelfHook,
+  libgcc,
   # manually
-, version
-, url
-, hash
-, ...
+  version,
+  url,
+  hash,
+  ...
 }:
 
 stdenv.mkDerivation {
@@ -21,7 +22,7 @@ stdenv.mkDerivation {
 
   sourceRoot = ".";
 
-  nativeBuildInputs = [
+  nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [
     autoPatchelfHook
   ];
 

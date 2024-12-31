@@ -30,7 +30,7 @@ let
       cli.${escapedRef} = callPackage ./cli.nix {
         inherit version;
         url = mkCliUri version;
-        hash = record.cliHash;
+        hash = record."${target}-cliHash";
       };
       core.${escapedRef} = callPackage ./core.nix {
         inherit version coreSrc;
