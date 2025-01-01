@@ -32,7 +32,7 @@ stdenv.mkDerivation {
 
   installPhase =
     let
-      mkInstall = bin: "install -m755 -D ${bin} $out/bin/${bin}";
+      mkInstall = bin: "install -m755 -D bin/${bin} $out/bin/${bin}";
       bins = [
         "moonfmt"
         "mooninfo"
