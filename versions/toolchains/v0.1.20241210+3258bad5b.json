@@ -1,4 +1,5 @@
 {
   "version": "v0.1.20241210+3258bad5b",
-  "cliHash": "sha256-HrzN8vm9+IdezommC9wXDvk1D4WCA9M3JcGdtzdr9Ig="
+  "linux-x86_64-cliHash": "sha256-HrzN8vm9+IdezommC9wXDvk1D4WCA9M3JcGdtzdr9Ig=",
+  "darwin-aarch64-cliHash": "sha256-xF+VjzTpe7M8lc2PgxTuW7aQ5oFUtJnDZLYw998NxHc="
 }

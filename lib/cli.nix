@@ -1,13 +1,14 @@
-{ stdenv
-, lib
-, fetchurl
-, autoPatchelfHook
-, libgcc
+{
+  stdenv,
+  lib,
+  fetchurl,
+  autoPatchelfHook,
+  libgcc,
   # manually
-, version
-, url
-, hash
-, ...
+  version,
+  url,
+  hash,
+  ...
 }:
 
 stdenv.mkDerivation {
@@ -21,7 +22,7 @@ stdenv.mkDerivation {
 
   sourceRoot = ".";
 
-  nativeBuildInputs = [
+  nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [
     autoPatchelfHook
   ];
 
@@ -31,7 +32,7 @@ stdenv.mkDerivation {
 
   installPhase =
     let
-      mkInstall = bin: "install -m755 -D ${bin} $out/bin/${bin}";
+      mkInstall = bin: "install -m755 -D bin/${bin} $out/bin/${bin}";
       bins = [
         "moonfmt"
         "mooninfo"
