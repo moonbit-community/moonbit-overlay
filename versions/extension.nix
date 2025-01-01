@@ -1,4 +1,5 @@
 {
+  "0.1.202412310" = "8qNQFuOyrqqpm/1y7wXkZNqX+Of2yg6OA4LAhTWUqvs=";
   "0.1.202412230" = "0C5gB7xxWwVzC0uMqVU85TFsFj7YYSHwvX+K9OmKdV8=";
   "0.1.202412180" = "GrcYctXLz+39HYGhtqIWwVrwPlTd+Li63axhqeQR5Is=";
   "0.1.202412160" = "VgiQjUztCwFV+DdKeNpjmQXfpxlL5Sd9kiHiZP8HpYU=";
