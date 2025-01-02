@@ -5,9 +5,13 @@
       url = "github:moonbitlang/core";
       flake = false;
     };
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, core }:
+  outputs = { self, nixpkgs, core, treefmt-nix }:
     let
       inherit (nixpkgs) lib;
       forEachSystem = lib.genAttrs lib.systems.flakeExposed;
@@ -40,6 +44,10 @@
       mkMoonbitLsp = pkgs: moonbit-bin: import ./lib/lsp.nix {
         inherit lib pkgs moonbit-bin;
       };
+
+      treefmtEval = forEachSystem (system:
+        treefmt-nix.lib.evalModule (nixpkgs.legacyPackages.${system}) ./treefmt.nix
+      );
     in
     {
       overlays = {
@@ -88,5 +96,9 @@
           description = "A startup basic MoonBit project";
         };
       };
+
+      formatter = forEachSystem (system:
+        treefmtEval.${system}.config.build.wrapper
+      );
     };
 }
