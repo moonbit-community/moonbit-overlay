@@ -34,7 +34,6 @@ let
       };
       core.${escapedRef} = callPackage ./core.nix {
         inherit version coreSrc;
-        hash = record.coreHash;
       };
 
       moonbit.${escapedRef} = callPackage ./bundle.nix {
