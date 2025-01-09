@@ -21,7 +21,8 @@ fetch-sha256() {
   echo "$hash"
 }
 
-for target in linux-x86_64 darwin-aarch64; do
+run_version=""
+for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
   target_uri="$(dash_to_underscore $target)_cli_uri"
   target_hash="$(dash_to_underscore $target)_cliHash"
   # phase 0
@@ -37,19 +38,24 @@ for target in linux-x86_64 darwin-aarch64; do
   # phase 1
 
   if ! git diff --exit-code $latest_file; then
-    version=$(nix run .\#moonc -- -v)
-    if [ -z "${version}" ]; then
+    # Run only once on linux-x86_64
+    # assume that all `moonc` in different arches have the same version
+    if [ -z "${run_version}" ]; then
+      run_version=$(nix run .\#moonc -- -v)
+    fi
+
+    if [ -z "${run_version}" ]; then
       echo -e "error: failed get version from moonc" > /dev/stderr
       exit 1
     fi
-    echo -e "\e[0;36mcurrent version: \e[1;36m$version\e[0m" > /dev/stderr
+    echo -e "\e[0;36mcurrent version: \e[1;36m$run_version\e[0m" > /dev/stderr
 
     # update latest
-    $sedi "s|version\": \".*\"|version\": \"$version\"|" $latest_file
+    $sedi "s|version\": \".*\"|version\": \"$run_version\"|" $latest_file
     # re-fetch
     # NOTE: uri 'latest/moonbit.tar.gz' and
     #       uri '(latest moonc -v)/moonbit.tar.gz' are not same
-    escaped_version=${version:1}
+    escaped_version=${run_version:1}
     escaped_version=${escaped_version//+/%2B}
 
     target_uri="$uri/binaries/$escaped_version/moonbit-$target.tar.gz"
@@ -59,7 +65,7 @@ for target in linux-x86_64 darwin-aarch64; do
 
     $sedi "s|$target-cliHash\": \"sha256-.*\"|$target-cliHash\": \"sha256-$target_hash\"|" $latest_file
     # pin
-    cp $latest_file "$toolchains_dir/$version.json"
+    cp $latest_file "$toolchains_dir/$run_version.json"
   fi
 done
 
