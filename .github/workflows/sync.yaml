@@ -35,7 +35,7 @@ jobs:
         git config --local user.name "GitHub Action"
         git add flake.lock
         git commit -m "flake: update core"
-    - name: Push version changes
+    - name: Push core changes
       if: steps.commit_core.outcome == 'success'
       uses: ad-m/github-push-action@master
       with:
