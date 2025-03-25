@@ -25,26 +25,39 @@ jobs:
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
 
+    - name: Update core
+      run: nix flake update core
+    - name: Check and commit changes (core)
+      id: commit_core
+      continue-on-error: true
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add flake.lock
+        git commit -m "flake: update core"
+    - name: Push version changes
+      if: steps.commit_core.outcome == 'success'
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Prefetch latest MoonBit
       timeout-minutes: 5
       run: ./scripts/fetch_toolchains.sh
-
     - name: Prefetch latest vscode extension moonbit-lang
       timeout-minutes: 5
       run: ./scripts/fetch_extension.sh
 
-    - name: Check and commit changes
-      id: commit
+    - name: Check and commit changes (versions)
+      id: commit_version
       continue-on-error: true
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add versions
         git commit -m "versions: update"
-
-    - name: Push changes
-      if: steps.commit.outcome == 'success'
+    - name: Push version changes
+      if: steps.commit_version.outcome == 'success'
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: master
