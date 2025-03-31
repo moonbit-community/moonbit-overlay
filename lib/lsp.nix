@@ -8,12 +8,12 @@ let
   extensionsVersions = import ../versions/extension.nix;
 
   mkMLang =
-    version:
+    version: hash:
     pkgs.vscode-utils.extensionFromVscodeMarketplace {
       name = "moonbit-lang";
       publisher = "moonbit";
-      version = version;
-      sha256 = extensionsVersions.${version};
+      inherit version;
+      sha256 = hash;
     };
   mkMLsp =
     lang:
