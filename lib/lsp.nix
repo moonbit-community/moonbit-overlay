@@ -7,6 +7,7 @@
 let
   extensionsVersions = import ../versions/extension.nix;
 
+  # TODO: pin `latest` version to specific version
   mkMLang =
     version: hash:
     pkgs.vscode-utils.extensionFromVscodeMarketplace {
