@@ -20,10 +20,8 @@ let
     pkgs.writeShellApplication {
       name = "moonbit-lsp";
       runtimeInputs = [ pkgs.nodejs ];
-      text = ''
-        export MOON_HOME='${moonbit-bin.moonbit.latest}'
-        node ${lang}/share/vscode/extensions/moonbit.moonbit-lang/node/lsp-server.js
-      '';
+      runtimeEnv.MOON_HOME = "${moonbit-bin.moonbit.latest}";
+      text = "node ${lang}/share/vscode/extensions/moonbit.moonbit-lang/node/lsp-server.js";
     };
 in
 
