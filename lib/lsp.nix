@@ -5,10 +5,6 @@
 
 let
   extensionsVersions = import ../versions/extension.nix;
-  mkVersion = cli: "${builtins.substring 1 12 cli.version}0";
-  versions = lib.filterAttrs
-    (_: lib.flip builtins.hasAttr extensionsVersions)
-    (builtins.mapAttrs (_: mkVersion) moonbit-bin.cli);
 
   mkMLang = version: pkgs.vscode-utils.extensionFromVscodeMarketplace {
     name = "moonbit-lang";
@@ -27,5 +23,5 @@ let
 in
 
 {
-  lsp = builtins.mapAttrs (_: version: mkMLsp (mkMLang version)) versions;
+  lsp = builtins.mapAttrs (version: hash: mkMLsp (mkMLang version hash)) extensionsVersions;
 }

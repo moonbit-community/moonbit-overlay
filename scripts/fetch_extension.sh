@@ -23,15 +23,21 @@ fetch-extension-sha256() {
 
 echo "{" >> $extension
 
+latest=${versions[0]}
+echo "writing latest ($latest)" > /dev/stderr
+hash=$(fetch-extension-sha256 $latest)
+echo "  latest = \"$hash\";" >> $extension
+
 for v in "${versions[@]}"
 do
   # drop any version lt "0.1.202410310"
   if [[ "$v" == '"0.1.202410310"' ]]; then
     break
   fi
-  echo "appending $v" > /dev/stderr
+  escaped_v=${v//./_}
+  echo "writing ${escaped_v}" > /dev/stderr
   hash=$(fetch-extension-sha256 $v)
-  echo "  $v = \"$hash\";" >> $extension
+  echo "  ${escaped_v} = \"${hash}\";" >> $extension
 done
 
 echo "}" >> $extension
