@@ -1,7 +1,8 @@
-{ lib
-, fetchFromGitHub
-, ocamlPackages
-, ocaml
+{
+  lib,
+  fetchFromGitHub,
+  ocamlPackages,
+  ocaml,
 }:
 
 ocamlPackages.buildDunePackage {

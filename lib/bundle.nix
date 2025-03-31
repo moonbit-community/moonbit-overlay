@@ -1,14 +1,18 @@
-{ symlinkJoin
-, makeWrapper
+{
+  symlinkJoin,
+  makeWrapper,
   # manually
-, cli
-, core
-, ...
+  cli,
+  core,
+  ...
 }:
 
 symlinkJoin {
   name = "moonbit";
-  paths = [ cli core ];
+  paths = [
+    cli
+    core
+  ];
 
   dontUnpack = true;
 

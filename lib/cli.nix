@@ -1,13 +1,14 @@
-{ stdenv
-, lib
-, fetchurl
-, autoPatchelfHook
-, libgcc
-, # manually
-  version
-, url
-, hash
-, ...
+{
+  stdenv,
+  lib,
+  fetchurl,
+  autoPatchelfHook,
+  libgcc,
+  # manually
+  version,
+  url,
+  hash,
+  ...
 }:
 
 stdenv.mkDerivation {

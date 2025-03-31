@@ -9,25 +9,33 @@
     moonbit-overlay.url = "github:jetjinser/moonbit-overlay";
   };
 
-  outputs = inputs@{ flake-parts, ... }:
+  outputs =
+    inputs@{ flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [
         inputs.devshell.flakeModule
       ];
 
-      perSystem = { inputs', system, pkgs, ... }: {
-        _module.args.pkgs = import inputs.nixpkgs {
-          inherit system;
-          overlays = [ inputs.moonbit-overlay.overlays.default ];
-        };
+      perSystem =
+        {
+          inputs',
+          system,
+          pkgs,
+          ...
+        }:
+        {
+          _module.args.pkgs = import inputs.nixpkgs {
+            inherit system;
+            overlays = [ inputs.moonbit-overlay.overlays.default ];
+          };
 
-        devshells.default = {
-          packages = with pkgs; [
-            moonbit-bin.moonbit.latest
-            moonbit-bin.lsp.latest
-          ];
+          devshells.default = {
+            packages = with pkgs; [
+              moonbit-bin.moonbit.latest
+              moonbit-bin.lsp.latest
+            ];
+          };
         };
-      };
 
       systems = [
         "x86_64-linux"

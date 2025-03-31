@@ -1,7 +1,8 @@
-{ stdenv
+{
+  stdenv,
   # manually
-, coreSrc
-, ...
+  coreSrc,
+  ...
 }:
 
 stdenv.mkDerivation {

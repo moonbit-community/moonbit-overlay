@@ -11,42 +11,55 @@
     };
   };
 
-  outputs = { self, nixpkgs, core, treefmt-nix }:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      core,
+      treefmt-nix,
+    }:
     let
       inherit (nixpkgs) lib;
       forEachSystem = lib.genAttrs lib.systems.flakeExposed;
 
-      overlay = (final: prev:
+      overlay = (
+        final: prev:
         let
           inherit (final) lib;
         in
         {
-          moonbit-bin = (prev.moonbit-bin or { }) //
-            import ./lib/moonbit-bin.nix {
+          moonbit-bin =
+            (prev.moonbit-bin or { })
+            // import ./lib/moonbit-bin.nix {
               inherit lib;
               pkgs = final;
               versions = import ./versions.nix lib;
               coreSrc = core;
-            } //
-            import ./lib/lsp.nix {
+            }
+            // import ./lib/lsp.nix {
               inherit lib;
               inherit (final) moonbit-bin;
               pkgs = final;
             };
           moonbit-lang = final.callPackage ./lib/compiler.nix { };
-        });
+        }
+      );
 
       versions = import ./versions.nix lib;
-      mkMoonbitBin = pkgs: import ./lib/moonbit-bin.nix {
-        inherit lib pkgs versions;
-        coreSrc = core;
-      };
-      mkMoonbitLsp = pkgs: moonbit-bin: import ./lib/lsp.nix {
-        inherit lib pkgs moonbit-bin;
-      };
+      mkMoonbitBin =
+        pkgs:
+        import ./lib/moonbit-bin.nix {
+          inherit lib pkgs versions;
+          coreSrc = core;
+        };
+      mkMoonbitLsp =
+        pkgs: moonbit-bin:
+        import ./lib/lsp.nix {
+          inherit lib pkgs moonbit-bin;
+        };
 
-      treefmtEval = forEachSystem (system:
-        treefmt-nix.lib.evalModule (nixpkgs.legacyPackages.${system}) ./treefmt.nix
+      treefmtEval = forEachSystem (
+        system: treefmt-nix.lib.evalModule (nixpkgs.legacyPackages.${system}) ./treefmt.nix
       );
     in
     {
@@ -55,19 +68,23 @@
         moonbit-overlay = overlay;
       };
 
-      packages = forEachSystem (system:
+      packages = forEachSystem (
+        system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
         in
         mkMoonbitBin pkgs
-        // { default = self.packages.${system}.moonbit.latest; }
+        // {
+          default = self.packages.${system}.moonbit.latest;
+        }
         // mkMoonbitLsp pkgs self.packages.${system}
         // {
           compiler = pkgs.callPackage ./lib/compiler.nix { };
         }
       );
 
-      apps = forEachSystem (system:
+      apps = forEachSystem (
+        system:
         let
           getMoonbit = lib.getExe' self.packages.${system}.default;
           mkMoonbitApp = name: {
@@ -77,7 +94,8 @@
         in
         {
           default = self.apps.${system}.moon;
-        } // (lib.genAttrs [
+        }
+        // (lib.genAttrs [
           "moon"
           "moonc"
           "mooncake"
@@ -86,8 +104,8 @@
           "moonfmt"
           "mooninfo"
           "moonrrun"
-        ]
-          mkMoonbitApp));
+        ] mkMoonbitApp)
+      );
 
       templates = rec {
         default = moonbit-dev;
@@ -97,8 +115,6 @@
         };
       };
 
-      formatter = forEachSystem (system:
-        treefmtEval.${system}.config.build.wrapper
-      );
+      formatter = forEachSystem (system: treefmtEval.${system}.config.build.wrapper);
     };
 }

@@ -1,26 +1,36 @@
-{ lib
-, pkgs
-, versions
-, coreSrc
+{
+  lib,
+  pkgs,
+  versions,
+  coreSrc,
 }:
 
 let
   inherit (pkgs) stdenv callPackage;
 
   moonbitUri = "https://cli.moonbitlang.com";
-  target = {
-    "x86_64-linux" = "linux-x86_64";
-    "x86_64-darwin" = "darwin-x86_64";
-    "aarch64-darwin" = "darwin-aarch64";
-  }.${stdenv.hostPlatform.system} or (throw "Unsupported platform: ${stdenv.hostPlatform.system}");
+  target =
+    {
+      "x86_64-linux" = "linux-x86_64";
+      "x86_64-darwin" = "darwin-x86_64";
+      "aarch64-darwin" = "darwin-aarch64";
+    }
+    .${stdenv.hostPlatform.system} or (throw "Unsupported platform: ${stdenv.hostPlatform.system}");
 
   mkVersion = v: lib.escapeURL (lib.removePrefix "v" v);
   mkCliUri = version: "${moonbitUri}/binaries/${mkVersion version}/moonbit-${target}.tar.gz";
 
-  mk = ref: record:
+  mk =
+    ref: record:
     let
-      escapeFrom = [ "." "+" ];
-      escapeTo = [ "_" "-" ];
+      escapeFrom = [
+        "."
+        "+"
+      ];
+      escapeTo = [
+        "_"
+        "-"
+      ];
       escape = builtins.replaceStrings escapeFrom escapeTo;
 
       version = record.version;
@@ -42,5 +52,4 @@ let
       };
     };
 in
-builtins.foldl' lib.recursiveUpdate { }
-  (builtins.attrValues (lib.mapAttrs mk versions))
+builtins.foldl' lib.recursiveUpdate { } (builtins.attrValues (lib.mapAttrs mk versions))
