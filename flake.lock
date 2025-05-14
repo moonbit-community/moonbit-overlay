@@ -3,11 +3,11 @@
     "core": {
       "flake": false,
       "locked": {
-        "lastModified": 1747099144,
-        "narHash": "sha256-0XIi/LEduCVcptf0r/jVaC3z1C1VwfhHI92ebKowPAI=",
+        "lastModified": 1747137221,
+        "narHash": "sha256-17MYSIew4CGNy1k/wCsCC0iDPaU55xX6Y53tTj7z8e0=",
         "owner": "moonbitlang",
         "repo": "core",
-        "rev": "470b24de7479da67026050c727dc53acab03eb96",
+        "rev": "3f33b8812c033c59a4959ad3247e45dbcf380f85",
         "type": "github"
       },
       "original": {
