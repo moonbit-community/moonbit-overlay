@@ -7,6 +7,17 @@
 let
   extensionsVersions = import ../versions/extension.nix;
 
+  # TODO: libify
+  escapeFrom = [
+    "."
+    "+"
+  ];
+  escapeTo = [
+    "_"
+    "-"
+  ];
+  chase = builtins.replaceStrings escapeTo escapeFrom;
+
   # TODO: pin `latest` version to specific version
   mkMLang =
     version: hash:
@@ -27,5 +38,5 @@ let
 in
 
 {
-  lsp = builtins.mapAttrs (version: hash: mkMLsp (mkMLang version hash)) extensionsVersions;
+  lsp = builtins.mapAttrs (version: hash: mkMLsp (mkMLang (chase version) hash)) extensionsVersions;
 }
