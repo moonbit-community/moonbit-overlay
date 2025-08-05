@@ -1,5 +1,6 @@
 {
-  latest = "3Bn3Foq3X7OyyjrhTriH1QvXtX3PE66RJ5W2f1o85YE=";
+  latest = "iN4+/whjs6mWRK0iwUe1f01leHkc3wYBVENMJy+8sO4=";
+  "0_1_2025080401" = "iN4+/whjs6mWRK0iwUe1f01leHkc3wYBVENMJy+8sO4=";
   "0_1_2025080101" = "3Bn3Foq3X7OyyjrhTriH1QvXtX3PE66RJ5W2f1o85YE=";
   "0_1_2025072901" = "8nA8Q0x7br4KDs118uC5VBLglyvKbVKplJsoa6JyXMk=";
   "0_1_2025072801" = "Sq1mU0ThtN0fGklnATG6dcXlQ2SWqj1edz1TYmcdJ8U=";
