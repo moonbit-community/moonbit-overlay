@@ -1,5 +1,6 @@
 {
-  latest = "IrCQHh6sQlG0RlPdMrXt1vqHo5g2ocGpLjwLV5a9cqY=";
+  latest = "7PDv/94A3CbLAcpZlSeeTXlVCGeifma5Iu4jrIA0/UU=";
+  "0_1_2025082201" = "7PDv/94A3CbLAcpZlSeeTXlVCGeifma5Iu4jrIA0/UU=";
   "0_1_2025080702" = "IrCQHh6sQlG0RlPdMrXt1vqHo5g2ocGpLjwLV5a9cqY=";
   "0_1_2025080701" = "WhOOwpz4q3xL0wDtEslKPAkZFoA0u1CFHAy0IdHMUAk=";
   "0_1_2025080601" = "X+vlUdomQWQaCVRY6DTK9L9W5g0mOxFuxtMag7WbLEI=";
