@@ -48,6 +48,11 @@ for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
       echo -e "error: failed get version from moonc" > /dev/stderr
       exit 1
     fi
+
+    # remove the date suffix after the whitespace
+    if [[ "$run_version" == *" "* ]]; then
+      run_version="${run_version%% *}"
+    fi
     echo -e "\e[0;36mcurrent version: \e[1;36m$run_version\e[0m" > /dev/stderr
 
     # update latest
