@@ -30,26 +30,13 @@ stdenv.mkDerivation {
     libgcc
   ];
 
-  installPhase =
-    let
-      mkInstall = bin: "install -m755 -D bin/${bin} $out/bin/${bin}";
-      bins = [
-        "moonfmt"
-        "mooninfo"
-        "mooncake"
-        "moon"
-        "moon_cove_report"
-        "moonrun"
-        "moonc"
-        "moondoc"
-      ];
-      binsShell = lib.concatStringsSep "\n" (map mkInstall bins);
-    in
-    ''
-      runHook preInstall
-      ${binsShell}
-      runHook postInstall
-    '';
+  installPhase = ''
+    runHook preInstall
+    cp -r . $out
+    chmod +x $out/bin/*
+    chmod +x $out/bin/internal/tcc
+    runHook postInstall
+  '';
 
   meta = {
     homepage = "moonbitlang.com";
