@@ -27,7 +27,7 @@
         let
           inherit (final) lib;
         in
-        {
+        rec{
           moonbit-bin =
             (prev.moonbit-bin or { })
             // import ./lib/moonbit-bin.nix {
