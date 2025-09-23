@@ -24,7 +24,7 @@
 }:
 let
   inherit (import ../utils.nix { inherit stdenv lib; }) mkCliUri target;
-  
+
   cli = callPackage ../cli.nix {
     inherit version;
     url = mkCliUri version;

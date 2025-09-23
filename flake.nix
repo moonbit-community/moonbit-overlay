@@ -27,7 +27,7 @@
         let
           inherit (final) lib;
         in
-        rec{
+        rec {
           moonbit-bin =
             (prev.moonbit-bin or { })
             // import ./lib/moonbit-bin.nix {
@@ -89,7 +89,6 @@
           compiler = pkgs.callPackage ./lib/compiler.nix { };
         }
       );
-
       apps = forEachSystem (
         system:
         let
