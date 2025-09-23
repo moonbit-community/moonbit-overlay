@@ -33,6 +33,9 @@ stdenv.mkDerivation {
   installPhase = ''
     runHook preInstall
     cp -r . $out
+    # we patch this in lsp.nix
+    mv $out/bin/moonbit-lsp $out/bin/.moonbit-lsp-orig
+
     chmod +x $out/bin/*
     chmod +x $out/bin/internal/tcc
     runHook postInstall

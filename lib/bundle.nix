@@ -25,7 +25,7 @@ symlinkJoin {
     mkdir -p $out/registry
     mv $out/bin/moon $out/bin/.moon-wrapped
     makeWrapper ${bubblewrap}/bin/bwrap $out/bin/moon \
-      --run "export MOON_HOME=\''${MOON_HOME:-\$HOME/.moon}" \
+      --run "export MOON_HOME=\''${NIX_MOON_HOME:-\$HOME/.moon}; mkdir -p \$MOON_HOME/registry" \
       --add-flags "--argv0 moon \
       --bind / / --dev-bind /dev /dev \
       --bind \$HOME/.moon/registry \$MOON_HOME/registry \

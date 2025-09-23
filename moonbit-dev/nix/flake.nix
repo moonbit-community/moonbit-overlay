@@ -34,6 +34,13 @@
               moonbit-bin.moonbit.latest
               moonbit-bin.lsp.latest
             ];
+
+            env = [
+              {
+                name = "MOON_HOME";
+                value = "${pkgs.moonbit-bin.moonbit.latest}";
+              }
+            ];
           };
         };
 

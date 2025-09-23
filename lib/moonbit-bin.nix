@@ -53,6 +53,11 @@ let
         cli = cli."${escapedRef}";
         core = core."${escapedRef}";
       };
+
+      moonbit-lsp.${escapedRef} = callPackage ./lsp.nix {
+        inherit version;
+        bundle = moonbit."${escapedRef}";
+      };
     };
 in
 builtins.foldl' lib.recursiveUpdate { } (builtins.attrValues (lib.mapAttrs mk versions))
