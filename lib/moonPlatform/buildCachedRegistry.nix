@@ -1,5 +1,5 @@
 # Builder for registry with all dependencies cached.
-# Takes $MOON_HOME/registry/index/ and returns subset of $MOON_HOME 
+# Takes $MOON_HOME/registry/index/ and returns subset of $MOON_HOME
 # including only $MOON_HOME/registry/*.
 {
   lib,
