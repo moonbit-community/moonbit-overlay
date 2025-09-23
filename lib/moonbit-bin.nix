@@ -6,33 +6,13 @@
 }:
 
 let
-  inherit (pkgs) stdenv callPackage;
+  inherit (pkgs) callPackage;
 
-  moonbitUri = "https://cli.moonbitlang.com";
-  target =
-    {
-      "x86_64-linux" = "linux-x86_64";
-      "x86_64-darwin" = "darwin-x86_64";
-      "aarch64-darwin" = "darwin-aarch64";
-    }
-    .${stdenv.hostPlatform.system} or (throw "Unsupported platform: ${stdenv.hostPlatform.system}");
-
-  mkVersion = v: lib.escapeURL (lib.removePrefix "v" v);
-  mkCliUri = version: "${moonbitUri}/binaries/${mkVersion version}/moonbit-${target}.tar.gz";
+  inherit (callPackage ./utils.nix { }) mkCliUri target escape;
 
   mk =
     ref: record:
     let
-      escapeFrom = [
-        "."
-        "+"
-      ];
-      escapeTo = [
-        "_"
-        "-"
-      ];
-      escape = builtins.replaceStrings escapeFrom escapeTo;
-
       version = record.version;
       escapedRef = escape ref;
     in
