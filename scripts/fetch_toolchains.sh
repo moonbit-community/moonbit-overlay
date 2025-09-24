@@ -69,6 +69,11 @@ for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
     target_hash=$(fetch-sha256 $target_uri)
 
     $sedi "s|$target-cliHash\": \"sha256-.*\"|$target-cliHash\": \"sha256-$target_hash\"|" $latest_file
+
+    echo -e "\e[0;36mfetching core\e[0m" > /dev/stderr
+    target_hash=$(fetch-sha256 "$uri/cores/core-$escaped_version.tar.gz")
+    $sedi "s|coreHash\": \"sha256-.*\"|coreHash\": \"sha256-$target_hash\"|" $latest_file
+
     # pin
     cp $latest_file "$toolchains_dir/$run_version.json"
   fi
