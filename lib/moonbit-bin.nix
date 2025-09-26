@@ -19,6 +19,7 @@ let
 
   mkVersion = v: lib.escapeURL (lib.removePrefix "v" v);
   mkCliUri = version: "${moonbitUri}/binaries/${mkVersion version}/moonbit-${target}.tar.gz";
+  mkCoreUri = version: "${moonbitUri}/cores/core-${mkVersion version}.tar.gz";
 
   mk =
     ref: record:
@@ -43,12 +44,19 @@ let
         hash = record."${target}-cliHash";
       };
       core.${escapedRef} = callPackage ./core.nix {
-        inherit version coreSrc;
+        inherit version;
+        url = mkCoreUri version;
+        hash = record.coreHash;
       };
 
       moonbit.${escapedRef} = callPackage ./bundle.nix {
         cli = cli."${escapedRef}";
         core = core."${escapedRef}";
+      };
+
+      moonbit-lsp.${escapedRef} = callPackage ./lsp.nix {
+        inherit version;
+        bundle = moonbit."${escapedRef}";
       };
     };
 in

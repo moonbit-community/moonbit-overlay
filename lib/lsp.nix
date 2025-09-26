@@ -1,42 +1,24 @@
 {
   pkgs,
-  lib,
-  moonbit-bin,
+  # manually
+  version,
+  bundle,
 }:
+pkgs.stdenv.mkDerivation {
+  pname = "moonbit-lsp";
+  inherit version;
 
-let
-  extensionsVersions = import ../versions/extension.nix;
+  src = pkgs.emptyDirectory;
 
-  # TODO: libify
-  escapeFrom = [
-    "."
-    "+"
-  ];
-  escapeTo = [
-    "_"
-    "-"
-  ];
-  chase = builtins.replaceStrings escapeTo escapeFrom;
+  buildInputs = [ pkgs.nodejs ];
 
-  # TODO: pin `latest` version to specific version
-  mkMLang =
-    version: hash:
-    pkgs.vscode-utils.extensionFromVscodeMarketplace {
-      name = "moonbit-lang";
-      publisher = "moonbit";
-      inherit version;
-      sha256 = hash;
-    };
-  mkMLsp =
-    lang:
-    pkgs.writeShellApplication {
-      name = "moonbit-lsp";
-      runtimeInputs = [ pkgs.nodejs ];
-      runtimeEnv.MOON_HOME = "${moonbit-bin.moonbit.latest}";
-      text = "node ${lang}/share/vscode/extensions/moonbit.moonbit-lang/node/lsp-server.js";
-    };
-in
-
-{
-  lsp = builtins.mapAttrs (version: hash: mkMLsp (mkMLang (chase version) hash)) extensionsVersions;
+  buildPhase = ''
+    runHook preBuild
+    mkdir -p $out/bin
+    cp ${bundle}/bin/.moonbit-lsp-orig $out/bin/moonbit-lsp
+    sed -i '/#!\/usr\/bin\/env node/a process.env.MOON_HOME = "${bundle}";' $out/bin/moonbit-lsp
+    sed -i '1s|#!/usr/bin/env node|#!${pkgs.nodejs}/bin/node|' $out/bin/moonbit-lsp
+    chmod +x $out/bin/moonbit-lsp
+    runHook postBuild
+  '';
 }
