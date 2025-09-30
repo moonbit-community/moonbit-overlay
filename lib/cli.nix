@@ -4,6 +4,7 @@
   fetchurl,
   autoPatchelfHook,
   libgcc,
+  git,
   # manually
   version,
   url,
@@ -28,6 +29,7 @@ stdenv.mkDerivation {
 
   buildInputs = [
     libgcc
+    git
   ];
 
   installPhase =
