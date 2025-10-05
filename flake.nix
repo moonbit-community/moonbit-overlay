@@ -35,11 +35,6 @@
               pkgs = final;
               versions = import ./versions.nix lib;
               coreSrc = core;
-            }
-            // import ./lib/lsp.nix {
-              inherit lib;
-              inherit (final) moonbit-bin;
-              pkgs = final;
             };
           moonbit-lang = final.callPackage ./lib/compiler.nix { };
         }
@@ -51,11 +46,6 @@
         import ./lib/moonbit-bin.nix {
           inherit lib pkgs versions;
           coreSrc = core;
-        };
-      mkMoonbitLsp =
-        pkgs: moonbit-bin:
-        import ./lib/lsp.nix {
-          inherit lib pkgs moonbit-bin;
         };
 
       treefmtEval = forEachSystem (
@@ -77,7 +67,6 @@
         // {
           default = self.packages.${system}.moonbit.latest;
         }
-        // mkMoonbitLsp pkgs self.packages.${system}
         // {
           compiler = pkgs.callPackage ./lib/compiler.nix { };
         }
