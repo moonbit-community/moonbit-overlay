@@ -1,10 +1,6 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    core = {
-      url = "github:moonbitlang/core";
-      flake = false;
-    };
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -15,7 +11,6 @@
     {
       self,
       nixpkgs,
-      core,
       treefmt-nix,
     }:
     let
@@ -34,7 +29,6 @@
               inherit lib;
               pkgs = final;
               versions = import ./versions.nix lib;
-              coreSrc = core;
             }
             // import ./lib/lsp.nix {
               inherit lib;
@@ -50,7 +44,6 @@
         pkgs:
         import ./lib/moonbit-bin.nix {
           inherit lib pkgs versions;
-          coreSrc = core;
         };
       mkMoonbitLsp =
         pkgs: moonbit-bin:
