@@ -118,3 +118,6 @@ Check available versions in the [directory](versions/).
 
 The moonbit-overlay is heavily inspired by [rust-overlay](https://github.com/oxalica/rust-overlay).
 
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
