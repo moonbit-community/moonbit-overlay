@@ -2,7 +2,6 @@
   lib,
   pkgs,
   versions,
-  coreSrc,
 }:
 
 let
