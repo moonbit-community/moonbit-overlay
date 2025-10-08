@@ -16,14 +16,13 @@
   callPackage,
   # manually
   versions,
-  coreSrc,
 }:
 {
   # public API
   version,
 }:
 let
-  inherit (import ../utils.nix { inherit stdenv lib; }) mkCliUri target;
+  inherit (import ../utils.nix { inherit stdenv lib; }) mkCliUri mkCoreUri target;
 
   cli = callPackage ../cli.nix {
     inherit version;
@@ -32,7 +31,9 @@ let
   };
 
   core = callPackage ../core.nix {
-    inherit version coreSrc;
+    inherit version;
+    url = mkCoreUri version;
+    hash = versions."${version}".coreHash;
   };
 
   fetchMoonPackage = import ./fetchMoonPackage.nix {

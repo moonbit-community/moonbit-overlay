@@ -39,7 +39,6 @@
 
           mkMoonPlatform = final.callPackage ./lib/moonPlatform {
             versions = import ./versions.nix lib;
-            coreSrc = core;
           };
           moonPlatform = mkMoonPlatform { version = "latest"; };
           versions = import ./versions.nix lib;
