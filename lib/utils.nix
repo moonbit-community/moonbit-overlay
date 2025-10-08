@@ -10,6 +10,7 @@ rec {
     .${stdenv.hostPlatform.system} or (throw "Unsupported platform: ${stdenv.hostPlatform.system}");
 
   mkVersion = v: lib.escapeURL (lib.removePrefix "v" v);
+  mkCoreUri = version: "${moonbitUri}/cores/core-${mkVersion version}.tar.gz";
   mkCliUri = version: "${moonbitUri}/binaries/${mkVersion version}/moonbit-${target}.tar.gz";
   escape =
     let
