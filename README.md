@@ -78,7 +78,6 @@ nix flake init -t github:jetjinser/moonbit-overlay
 ## Moonbit Package Builder
 
 ```nix
-
 {
   description = "A startup basic MoonBit project";
 
@@ -95,10 +94,6 @@ nix flake init -t github:jetjinser/moonbit-overlay
 
   outputs = inputs@{ flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
-      imports = [
-        inputs.devshell.flakeModule
-      ];
-
       perSystem = { inputs', system, pkgs, ... }: {
         _module.args.pkgs = import inputs.nixpkgs {
           inherit system;
