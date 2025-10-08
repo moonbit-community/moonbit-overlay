@@ -95,9 +95,6 @@ nix flake init -t github:jetjinser/moonbit-overlay
 
   outputs = inputs@{ flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
-      imports = [
-        inputs.devshell.flakeModule
-      ];
 
       perSystem = { inputs', system, pkgs, ... }: {
         _module.args.pkgs = import inputs.nixpkgs {
