@@ -2,13 +2,12 @@
   lib,
   pkgs,
   versions,
-  coreSrc,
 }:
 
 let
   inherit (pkgs) callPackage;
 
-  inherit (callPackage ./utils.nix { }) mkCliUri target escape;
+  inherit (callPackage ./utils.nix { }) mkCliUri target escape mkCoreUri;
 
   mk =
     ref: record:
@@ -23,7 +22,9 @@ let
         hash = record."${target}-cliHash";
       };
       core.${escapedRef} = callPackage ./core.nix {
-        inherit version coreSrc;
+        inherit version;
+        url = mkCoreUri version;
+        hash = record.coreHash;
       };
 
       moonbit.${escapedRef} = callPackage ./bundle.nix {

@@ -1,21 +1,5 @@
 {
   "nodes": {
-    "core": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1758507397,
-        "narHash": "sha256-PmJgqMUOIQ5HBGw2lNkPpKgXdnA2HORZot0e5+9NMO8=",
-        "owner": "moonbitlang",
-        "repo": "core",
-        "rev": "bcc92a0228909931cb0720799d01aa496208c486",
-        "type": "github"
-      },
-      "original": {
-        "owner": "moonbitlang",
-        "repo": "core",
-        "type": "github"
-      }
-    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1742272065,
@@ -34,7 +18,6 @@
     },
     "root": {
       "inputs": {
-        "core": "core",
         "nixpkgs": "nixpkgs",
         "treefmt-nix": "treefmt-nix"
       }

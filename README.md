@@ -159,7 +159,8 @@ Check available versions in the [directory](versions/).
 ## TODO
 
 - [ ] overridable
-- [x] build from source (core)
+- [ ] build from source (core)
+  see [pull#10](https://github.com/moonbit-community/moonbit-overlay/pull/10)
 - [ ] re-support legacy default.nix
 
 ## Inspiration
