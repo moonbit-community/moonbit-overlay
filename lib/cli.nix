@@ -3,7 +3,9 @@
   lib,
   fetchurl,
   autoPatchelfHook,
+  makeWrapper,
   libgcc,
+  nodejs,
   # manually
   version,
   url,
@@ -24,6 +26,7 @@ stdenv.mkDerivation {
 
   nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [
     autoPatchelfHook
+    makeWrapper
   ];
 
   buildInputs = [
@@ -42,12 +45,15 @@ stdenv.mkDerivation {
         "moonrun"
         "moonc"
         "moondoc"
+        "moonbit-lsp"
       ];
       binsShell = lib.concatStringsSep "\n" (map mkInstall bins);
     in
     ''
       runHook preInstall
       ${binsShell}
+      wrapProgram "$out/bin/moonbit-lsp" \
+        --prefix PATH ":" ${lib.makeBinPath [ nodejs ]}
       runHook postInstall
     '';
 

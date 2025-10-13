@@ -61,7 +61,6 @@ nix flake init -t github:jetjinser/moonbit-overlay
         devshells.default = {
             packages = with pkgs; [
               moonbit-bin.moonbit.latest
-              moonbit-bin.lsp.latest
             ];
           };
       };
@@ -127,10 +126,12 @@ nix flake init -t github:jetjinser/moonbit-overlay
 moonbit-bin.moonbit.latest
 ```
 
-## MoonBit LSP (extracted from [moonbit-lang vscode extension](https://marketplace.visualstudio.com/items?itemName=moonbit.moonbit-lang))
+## MoonBit LSP (distributed with compiler)
+
+The moonbit-bin.moonbit.${version} package already includes moonbit-lsp.
 
 ```nix
-moonbit-bin.lsp.latest
+moonbit-bin.moonbit.latest
 ```
 
 ## Version
