@@ -51,11 +51,6 @@
         import ./lib/moonbit-bin.nix {
           inherit lib pkgs versions;
         };
-      mkMoonbitLsp =
-        pkgs: moonbit-bin:
-        import ./lib/lsp.nix {
-          inherit lib pkgs moonbit-bin;
-        };
 
       treefmtEval = forEachSystem (
         system: treefmt-nix.lib.evalModule (nixpkgs.legacyPackages.${system}) ./treefmt.nix
@@ -76,8 +71,9 @@
         // {
           default = self.packages.${system}.moonbit.latest;
         }
-        // mkMoonbitLsp pkgs self.packages.${system}
         // {
+          # compiler build from source
+          # not used now
           compiler = pkgs.callPackage ./lib/compiler.nix { };
         }
       );
