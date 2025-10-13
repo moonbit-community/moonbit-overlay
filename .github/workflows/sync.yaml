@@ -25,28 +25,10 @@ jobs:
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
 
-    - name: Update core
-      run: nix flake update core
-    - name: Check and commit changes (core)
-      id: commit_core
-      continue-on-error: true
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add flake.lock
-        git commit -m "flake: update core"
-    - name: Push core changes
-      if: steps.commit_core.outcome == 'success'
-      uses: ad-m/github-push-action@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-
     - name: Prefetch latest MoonBit
+      id: fetch_toolchains
       timeout-minutes: 5
       run: ./scripts/fetch_toolchains.sh
-    - name: Prefetch latest vscode extension moonbit-lang
-      timeout-minutes: 5
-      run: ./scripts/fetch_extension.sh
 
     - name: Check and commit changes (versions)
       id: commit_version
@@ -61,3 +43,10 @@ jobs:
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Release new version
+      uses: ncipollo/release-action@v1
+      with:
+        tag: "v${{ steps.fetch_toolchains.outputs.version }}"
+        body: "New version ${{ steps.fetch_toolchains.outputs.version }} fetched from MoonBit."
+        artifacts: "moonbit-linux-x86_64.tar.gz, moonbit-darwin-aarch64.tar.gz, moonbit-core.tar.gz"
