@@ -7,12 +7,12 @@
   libgcc,
   nodejs,
   # manually
+  moon-patched,
   version,
   url,
   hash,
   ...
 }:
-
 stdenv.mkDerivation {
   pname = "moonbit-cli";
   inherit version;
@@ -40,18 +40,33 @@ stdenv.mkDerivation {
         "moonfmt"
         "mooninfo"
         "mooncake"
-        "moon"
         "moon_cove_report"
-        "moonrun"
         "moonc"
         "moondoc"
         "moonbit-lsp"
-      ];
+      ]
+      ++ (
+        if version == "latest" then
+          [
+            "moon"
+            "moonrun"
+          ]
+        else
+          [ ]
+      );
       binsShell = lib.concatStringsSep "\n" (map mkInstall bins);
     in
     ''
       runHook preInstall
       ${binsShell}
+
+    ''
+    + lib.optionalString (version != "latest") ''
+      install -m755 -D ${moon-patched}/bin/moon $out/bin/moon
+      install -m755 -D ${moon-patched}/bin/moonrun $out/bin/moonrun
+    ''
+    + ''
+
       wrapProgram "$out/bin/moonbit-lsp" \
         --prefix PATH ":" ${lib.makeBinPath [ nodejs ]}
       runHook postInstall

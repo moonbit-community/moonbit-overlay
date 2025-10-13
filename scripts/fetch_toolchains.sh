@@ -5,6 +5,7 @@ latest_file="$toolchains_dir/latest.json"
 
 sedi="nix run nixpkgs#gnused -- -i"
 sednr="nix run nixpkgs#gnused -- -nr"
+jq="nix run nixpkgs#jq --"
 
 dash_to_underscore() {
     echo "$1" | tr '-' '_'
@@ -19,6 +20,32 @@ fetch-sha256() {
   echo -e "\e[0;36mcalculated hash: \e[1;36m$hash\e[0m" > /dev/stderr
 
   echo "$hash"
+}
+
+fetch-github-sha256() {
+  owner="$1"
+  repo="$2"
+  rev="$3"
+  echo -e "\e[0;36mfetching \e[4;36mhttps://github.com/$owner/$repo/archive/$rev.tar.gz\e[0;36m...\e[0m" > /dev/stderr
+  hash=$(nix-prefetch-url --unpack "https://github.com/$owner/$repo/archive/$rev.tar.gz")
+  hash=$(nix-hash --to-base64 --type sha256 "$hash")
+  echo -e "\e[0;36mcalculated hash: \e[1;36m$hash\e[0m" > /dev/stderr
+
+  echo "$hash"
+}
+
+find_full_rev() {
+  owner="$1"
+  repo="$2"
+  short_rev="$3"
+  until="$4"
+  echo -e "\e[0;36mfetching full rev for \e[4;36m$short_rev\e[0m" > /dev/stderr
+  full_rev=$(curl -s "https://api.github.com/repos/$owner/$repo/commits?until=$until" | $jq '.[].sha' | $sednr "s/\"($short_rev.*)\"/\1/p")
+  if [ -z "$full_rev" ]; then
+    echo -e "\e[0;31merror: failed to get full rev from $short_rev\e[0m" > /dev/stderr
+    exit 1
+  fi
+  echo "$full_rev"
 }
 
 run_version=""
@@ -44,13 +71,14 @@ for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
     $sedi "s|coreHash\": \"sha256-.*\"|coreHash\": \"sha256-$target_hash\"|" $latest_file
 
     # Run only once on linux-x86_64
-    # assume that all `moonc` in different arches have the same version
-    if [ -z "${run_version}" ]; then
+    # assume that all `moonc` and `moon` in different arches have the same version
+    if [ -z "${run_version}" ] || [ -z "${moon_version}" ]; then
       run_version=$(nix run .\#moonc -- -v)
+      moon_version=$(nix run .\#moon version)
     fi
 
-    if [ -z "${run_version}" ]; then
-      echo -e "error: failed get version from moonc" > /dev/stderr
+    if [ -z "${run_version}" ] || [ -z "${moon_version}" ]; then
+      echo -e "error: failed get version from toolchain" > /dev/stderr
       exit 1
     fi
 
@@ -69,6 +97,20 @@ for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
 
     # update latest
     $sedi "s|version\": \".*\"|version\": \"$run_version\"|" $latest_file
+
+    echo -e "\e[0;36mfetching core\e[0m" > /dev/stderr
+    target_hash=$(fetch-sha256 "$uri/cores/core-latest.tar.gz" "moonbit-core.tar.gz")
+    $sedi "s|coreHash\": \"sha256-.*\"|coreHash\": \"sha256-$target_hash\"|" $latest_file
+
+    # update moon version
+    version_arr=($(echo $moon_version | sed -r 's/.*\((.*) (.*)\)/\1 \2/'))
+    short_rev="${version_arr[0]}"
+    build_date="${version_arr[1]}"
+    rev=$(find_full_rev "moonbitlang" "moon" "$short_rev" "$build_date")
+    $sedi "s|moonRev\": \".*\"|moonRev\": \"$rev\"|" $latest_file
+
+    moon_hash=$(fetch-github-sha256 "moonbitlang" "moon" "$rev")
+    $sedi "s|moonHash\": \"sha256-.*\"|moonHash\": \"sha256-$moon_hash\"|" $latest_file
 
     # pin
     cp $latest_file "$toolchains_dir/$run_version.json"
