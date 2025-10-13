@@ -9,7 +9,7 @@ rec {
     }
     .${stdenv.hostPlatform.system} or (throw "Unsupported platform: ${stdenv.hostPlatform.system}");
 
-  mkVersion = v: lib.escapeURL v;
+  mkVersion = lib.escapeURL;
   mkCoreUri =
     version:
     if version == "latest" then
