@@ -11,11 +11,10 @@ dash_to_underscore() {
 
 fetch-sha256() {
   uri="$1"
+  name="$2"
   echo -e "\e[0;36mfetching \e[4;36m$uri\e[0;36m...\e[0m" > /dev/stderr
-  touch temp
-  curl -o- $uri > temp
-  hash=$(nix-hash --type sha256 --base64 --flat temp)
-  rm temp
+  curl -o "$name" $uri
+  hash=$(nix-hash --type sha256 --base64 --flat "$name")
   echo -e "\e[0;36mcalculated hash: \e[1;36m$hash\e[0m" > /dev/stderr
 
   echo "$hash"
@@ -30,7 +29,7 @@ for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
 
   target_uri="$uri/binaries/latest/moonbit-$target.tar.gz"
 
-  target_hash=$(fetch-sha256 $target_uri)
+  target_hash=$(fetch-sha256 $target_uri "moonbit-$target.tar.gz")
 
   $sedi "s|version\": \".*\"|version\": \"latest\"|" $latest_file
   $sedi "s|$target-cliHash\": \"sha256-.*\"|$target-cliHash\": \"sha256-$target_hash\"|" $latest_file
@@ -57,25 +56,16 @@ for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
 
     # update latest
     $sedi "s|version\": \".*\"|version\": \"$run_version\"|" $latest_file
-    # re-fetch
-    # NOTE: uri 'latest/moonbit.tar.gz' and
-    #       uri '(latest moonc -v)/moonbit.tar.gz' are not same
-    escaped_version=${run_version:1}
-    escaped_version=${escaped_version//+/%2B}
-
-    target_uri="$uri/binaries/$escaped_version/moonbit-$target.tar.gz"
-
-    echo -e "\e[0;36mre-fetching\e[0m..." > /dev/stderr
-    target_hash=$(fetch-sha256 $target_uri)
-
-    $sedi "s|$target-cliHash\": \"sha256-.*\"|$target-cliHash\": \"sha256-$target_hash\"|" $latest_file
 
     echo -e "\e[0;36mfetching core\e[0m" > /dev/stderr
-    target_hash=$(fetch-sha256 "$uri/cores/core-$escaped_version.tar.gz")
+    target_hash=$(fetch-sha256 "$uri/cores/core-latest.tar.gz" "moonbit-core.tar.gz")
     $sedi "s|coreHash\": \"sha256-.*\"|coreHash\": \"sha256-$target_hash\"|" $latest_file
 
     # pin
     cp $latest_file "$toolchains_dir/$run_version.json"
+
+    # output version to action
+    echo "version=$run_version" >> "$GITHUB_OUTPUT"
   fi
 done
 
