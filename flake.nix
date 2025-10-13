@@ -29,11 +29,6 @@
               inherit lib;
               pkgs = final;
               versions = import ./versions.nix lib;
-            }
-            // import ./lib/lsp.nix {
-              inherit lib;
-              inherit (final) moonbit-bin;
-              pkgs = final;
             };
           moonbit-lang = final.callPackage ./lib/compiler.nix { };
 
