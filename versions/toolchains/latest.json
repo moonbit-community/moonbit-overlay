@@ -1,6 +1,6 @@
 {
   "version": "v0.6.28+d96d14d39",
-  "coreHash": "sha256-qCS8dzniJuG0DqD4xOT0xveW/DtKv6bpq+O9EZow2Tg=",
+  "coreHash": "sha256-DgW0vajL9H90W/BRgeXqV/0Y/764duL4AQUdCWCbn6I=",
   "linux-x86_64-cliHash": "sha256-qCS8dzniJuG0DqD4xOT0xveW/DtKv6bpq+O9EZow2Tg=",
   "darwin-aarch64-cliHash": "sha256-qCS8dzniJuG0DqD4xOT0xveW/DtKv6bpq+O9EZow2Tg="
 }
