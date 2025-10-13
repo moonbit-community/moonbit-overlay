@@ -126,6 +126,7 @@
           "moonfmt"
           "mooninfo"
           "moonrrun"
+          "moonbit-lsp"
         ] mkMoonbitApp)
       );
 
