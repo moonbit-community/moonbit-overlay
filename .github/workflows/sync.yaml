@@ -16,9 +16,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-      with:
-        persist-credentials: false
-        ref: master
 
     - name: Install Nix
       uses: cachix/install-nix-action@v25
@@ -47,6 +44,6 @@ jobs:
     - name: Release new version
       uses: ncipollo/release-action@v1
       with:
-        tag: "v${{ steps.fetch_toolchains.outputs.version }}"
+        tag: ${{ steps.fetch_toolchains.outputs.version }}
         body: "New version ${{ steps.fetch_toolchains.outputs.version }} fetched from MoonBit."
         artifacts: "moonbit-linux-x86_64.tar.gz, moonbit-darwin-aarch64.tar.gz, moonbit-core.tar.gz"
