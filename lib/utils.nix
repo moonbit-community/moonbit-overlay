@@ -15,13 +15,13 @@ rec {
     if version == "latest" then
       "${moonbitUri}/cores/core-latest.tar.gz"
     else
-      "https://github.com/Sehouz/moonbit-overlay/releases/download/${mkVersion version}/moonbit-core.tar.gz";
+      "https://github.com/moonbit-community/moonbit-overlay/releases/download/${mkVersion version}/moonbit-core.tar.gz";
   mkCliUri =
     version:
     if version == "latest" then
       "${moonbitUri}/binaries/latest/moonbit-${target}.tar.gz"
     else
-      "https://github.com/Sehouz/moonbit-overlay/releases/download/${mkVersion version}/moonbit-${target}.tar.gz";
+      "https://github.com/moonbit-community/moonbit-overlay/releases/download/${mkVersion version}/moonbit-${target}.tar.gz";
   escape =
     let
       escapeFrom = [
