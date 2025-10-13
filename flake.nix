@@ -17,6 +17,12 @@
       inherit (nixpkgs) lib;
       forEachSystem = lib.genAttrs lib.systems.flakeExposed;
 
+      lsp = lib.warn ''
+        moonbit-overlay: 'lsp' is deprecated and has been removed.
+        The moonbit-bin.moonbit.$${version} package already includes moonbit-lsp.
+        For more information, see: https://github.com/moonbit-community/moonbit-overlay/pull/14
+      '' null;
+
       overlay = (
         final: prev:
         let
@@ -29,6 +35,9 @@
               inherit lib;
               pkgs = final;
               versions = import ./versions.nix lib;
+            }
+            // {
+              inherit lsp;
             };
           moonbit-lang = final.callPackage ./lib/compiler.nix { };
 
@@ -65,6 +74,9 @@
         mkMoonbitBin pkgs
         // {
           default = self.packages.${system}.moonbit.latest;
+        }
+        // {
+          inherit lsp;
         }
         // {
           # compiler build from source
