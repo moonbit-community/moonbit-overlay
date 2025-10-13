@@ -13,7 +13,7 @@ fetch-sha256() {
   uri="$1"
   name="$2"
   echo -e "\e[0;36mfetching \e[4;36m$uri\e[0;36m...\e[0m" > /dev/stderr
-  curl -O $name $uri
+  curl -o $name $uri
   hash=$(nix-hash --type sha256 --base64 --flat $name)
   echo -e "\e[0;36mcalculated hash: \e[1;36m$hash\e[0m" > /dev/stderr
 
