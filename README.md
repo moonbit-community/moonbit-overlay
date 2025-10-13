@@ -128,8 +128,10 @@ moonbit-bin.moonbit.latest
 
 ## MoonBit LSP (distributed with compiler)
 
+The moonbit-bin.moonbit.${version} package already includes moonbit-lsp.
+
 ```nix
-moonbit-bin.moonbit-lsp.latest
+moonbit-bin.moonbit.latest
 ```
 
 ## Version
