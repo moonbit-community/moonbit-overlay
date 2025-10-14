@@ -35,13 +35,14 @@ jobs:
         git config --local user.name "GitHub Action"
         git add versions
         git commit -m "versions: update"
+
     - name: Push version changes
       if: steps.commit_version.outcome == 'success'
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-
     - name: Release new version
+      if: steps.commit_version.outcome == 'success'
       uses: ncipollo/release-action@v1
       with:
         tag: ${{ steps.fetch_toolchains.outputs.version }}
