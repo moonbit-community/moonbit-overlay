@@ -4,6 +4,7 @@ toolchains_dir="./versions/toolchains"
 latest_file="$toolchains_dir/latest.json"
 
 sedi="nix run nixpkgs#gnused -- -i"
+sednr="nix run nixpkgs#gnused -- -nr"
 
 dash_to_underscore() {
     echo "$1" | tr '-' '_'
@@ -31,6 +32,7 @@ for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
 
   target_hash=$(fetch-sha256 $target_uri "moonbit-$target.tar.gz")
 
+  old_version=$($sednr 's|^\s*"version\": \"(.*)\",$|\1|' $latest_file)
   $sedi "s|version\": \".*\"|version\": \"latest\"|" $latest_file
   $sedi "s|$target-cliHash\": \"sha256-.*\"|$target-cliHash\": \"sha256-$target_hash\"|" $latest_file
 
@@ -57,6 +59,12 @@ for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
       run_version="${run_version%% *}"
     fi
     echo -e "\e[0;36mcurrent version: \e[1;36m$run_version\e[0m" > /dev/stderr
+
+    # skip if version not changed
+    if [ "$run_version" == "$old_version" ]; then
+      echo -e "\e[0;33mversion not changed ($run_version), skipping\e[0m" > /dev/stderr
+      exit 0
+    fi
 
     # update latest
     $sedi "s|version\": \".*\"|version\": \"$run_version\"|" $latest_file
