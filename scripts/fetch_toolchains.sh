@@ -49,6 +49,7 @@ find_full_rev() {
 }
 
 run_version=""
+old_version=$($sednr 's|^\s*"version\": \"(.*)\",$|\1|p' $latest_file)
 for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
   target_uri="$(dash_to_underscore $target)_cli_uri"
   target_hash="$(dash_to_underscore $target)_cliHash"
@@ -59,7 +60,6 @@ for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
 
   target_hash=$(fetch-sha256 $target_uri "moonbit-$target.tar.gz")
 
-  old_version=$($sednr 's|^\s*"version\": \"(.*)\",$|\1|p' $latest_file)
   $sedi "s|version\": \".*\"|version\": \"latest\"|" $latest_file
   $sedi "s|$target-cliHash\": \"sha256-.*\"|$target-cliHash\": \"sha256-$target_hash\"|" $latest_file
 
