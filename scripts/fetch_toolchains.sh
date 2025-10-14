@@ -63,6 +63,7 @@ for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
     # skip if version not changed
     if [ "$run_version" == "$old_version" ]; then
       echo -e "\e[0;33mversion not changed ($run_version), skipping\e[0m" > /dev/stderr
+      echo "skipped=true" >> "$GITHUB_OUTPUT"
       exit 0
     fi
 

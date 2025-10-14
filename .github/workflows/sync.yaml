@@ -29,6 +29,7 @@ jobs:
 
     - name: Check and commit changes (versions)
       id: commit_version
+      if: steps.fetch_toolchains.outputs.skipped != 'true'
       continue-on-error: true
       run: |
         git config --local user.email "action@github.com"
