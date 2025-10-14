@@ -36,13 +36,24 @@ jobs:
         git add versions
         git commit -m "versions: update"
 
+
     - name: Push version changes
       if: steps.commit_version.outcome == 'success'
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Check if tag exists
+      id: check_tag
+      run: |
+        TAG="${{ steps.fetch_toolchains.outputs.version }}"
+        if git fetch --tags && git tag | grep -q "^$TAG$"; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+        fi
     - name: Release new version
-      if: steps.commit_version.outcome == 'success'
+      if: steps.commit_version.outcome == 'success' && steps.check_tag.outputs.exists == 'false'
       uses: ncipollo/release-action@v1
       with:
         tag: ${{ steps.fetch_toolchains.outputs.version }}
