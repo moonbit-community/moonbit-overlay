@@ -37,6 +37,10 @@ for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
   # phase 1
 
   if ! git diff --exit-code $latest_file; then
+    echo -e "\e[0;36mfetching core\e[0m" > /dev/stderr
+    target_hash=$(fetch-sha256 "$uri/cores/core-latest.tar.gz" "moonbit-core.tar.gz")
+    $sedi "s|coreHash\": \"sha256-.*\"|coreHash\": \"sha256-$target_hash\"|" $latest_file
+
     # Run only once on linux-x86_64
     # assume that all `moonc` in different arches have the same version
     if [ -z "${run_version}" ]; then
@@ -56,10 +60,6 @@ for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
 
     # update latest
     $sedi "s|version\": \".*\"|version\": \"$run_version\"|" $latest_file
-
-    echo -e "\e[0;36mfetching core\e[0m" > /dev/stderr
-    target_hash=$(fetch-sha256 "$uri/cores/core-latest.tar.gz" "moonbit-core.tar.gz")
-    $sedi "s|coreHash\": \"sha256-.*\"|coreHash\": \"sha256-$target_hash\"|" $latest_file
 
     # pin
     cp $latest_file "$toolchains_dir/$run_version.json"
