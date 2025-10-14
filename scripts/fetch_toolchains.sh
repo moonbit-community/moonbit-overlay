@@ -32,7 +32,7 @@ for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
 
   target_hash=$(fetch-sha256 $target_uri "moonbit-$target.tar.gz")
 
-  old_version=$($sednr 's|^\s*"version\": \"(.*)\",$|\1|' $latest_file)
+  old_version=$($sednr 's|^\s*"version\": \"(.*)\",$|\1|p' $latest_file)
   $sedi "s|version\": \".*\"|version\": \"latest\"|" $latest_file
   $sedi "s|$target-cliHash\": \"sha256-.*\"|$target-cliHash\": \"sha256-$target_hash\"|" $latest_file
 
