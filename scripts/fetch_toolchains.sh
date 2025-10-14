@@ -34,20 +34,6 @@ fetch-github-sha256() {
   echo "$hash"
 }
 
-find_full_rev() {
-  owner="$1"
-  repo="$2"
-  short_rev="$3"
-  until="$4"
-  echo -e "\e[0;36mfetching full rev for \e[4;36m$short_rev\e[0m" > /dev/stderr
-  full_rev=$(curl -s "https://api.github.com/repos/$owner/$repo/commits?until=$until" | $jq '.[].sha' | $sednr "s/\"($short_rev.*)\"/\1/p")
-  if [ -z "$full_rev" ]; then
-    echo -e "\e[0;31merror: failed to get full rev from $short_rev\e[0m" > /dev/stderr
-    exit 1
-  fi
-  echo "$full_rev"
-}
-
 run_version=""
 old_version=$($sednr 's|^\s*"version\": \"(.*)\",$|\1|p' $latest_file)
 for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
@@ -103,13 +89,10 @@ for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
     $sedi "s|coreHash\": \"sha256-.*\"|coreHash\": \"sha256-$target_hash\"|" $latest_file
 
     # update moon version
-    version_arr=($(echo $moon_version | sed -r 's/.*\((.*) (.*)\)/\1 \2/'))
-    short_rev="${version_arr[0]}"
-    build_date="${version_arr[1]}"
-    rev=$(find_full_rev "moonbitlang" "moon" "$short_rev" "$build_date")
-    $sedi "s|moonRev\": \".*\"|moonRev\": \"$rev\"|" $latest_file
+    short_rev=$(echo $moon_version | sed -r 's/.*\((.*) .*\)/\1/')
+    $sedi "s|moonRev\": \".*\"|moonRev\": \"$short_rev\"|" $latest_file
 
-    moon_hash=$(fetch-github-sha256 "moonbitlang" "moon" "$rev")
+    moon_hash=$(fetch-github-sha256 "moonbitlang" "moon" "$short_rev")
     $sedi "s|moonHash\": \"sha256-.*\"|moonHash\": \"sha256-$moon_hash\"|" $latest_file
 
     echo "moon_revision=$rev" >> "$GITHUB_OUTPUT"
