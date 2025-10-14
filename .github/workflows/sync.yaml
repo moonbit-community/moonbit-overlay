@@ -27,6 +27,13 @@ jobs:
       timeout-minutes: 5
       run: ./scripts/fetch_toolchains.sh
 
+    - name: Prefetch latest Moon Patched Deps
+      if: steps.fetch_toolchains.outputs.skipped != 'true'
+      timeout-minutes: 5
+      run: ./lib/moon-patched/update.sh
+      env:
+        REVISION: ${{ steps.fetch_toolchains.outputs.moon_revision }}
+
     - name: Check and commit changes (versions)
       id: commit_version
       if: steps.fetch_toolchains.outputs.skipped != 'true'
@@ -35,6 +42,7 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add versions
+        git add lib/moon-patched/deps_versions.json
         git commit -m "versions: update"
 
 

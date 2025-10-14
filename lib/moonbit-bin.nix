@@ -16,7 +16,7 @@ let
       escapedRef = escape ref;
     in
     rec {
-      moon-patched.${escapedRef} = callPackage ./moon-patched.nix {
+      moon-patched.${escapedRef} = callPackage ./moon-patched {
         rev = record.moonRev;
         hash = record.moonHash;
       };
