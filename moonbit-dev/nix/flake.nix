@@ -6,7 +6,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     devshell.url = "github:numtide/devshell";
-    moonbit-overlay.url = "github:jetjinser/moonbit-overlay";
+    moonbit-overlay.url = "github:moonbit-community/moonbit-overlay";
   };
 
   outputs =
@@ -32,7 +32,13 @@
           devshells.default = {
             packages = with pkgs; [
               moonbit-bin.moonbit.latest
-              moonbit-bin.lsp.latest
+            ];
+
+            env = [
+              {
+                name = "MOON_HOME";
+                value = "${pkgs.moonbit-bin.moonbit.latest}";
+              }
             ];
           };
         };
