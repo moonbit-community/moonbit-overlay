@@ -5,7 +5,6 @@
   autoPatchelfHook,
   makeWrapper,
   libgcc,
-  nodejs,
   # manually
   moon-patched,
   version,
@@ -33,40 +32,21 @@ stdenv.mkDerivation {
     libgcc
   ];
 
-  installPhase =
-    let
-      mkInstall = bin: "install -m755 -D bin/${bin} $out/bin/${bin}";
-      bins =
-        [
-          "moonfmt"
-          "mooninfo"
-          "mooncake"
-          "moon_cove_report"
-          "moonc"
-          "moondoc"
-          "moonbit-lsp"
-        ]
-        ++ (
-          if version == "latest" then
-            [
-              "moon"
-              "moonrun"
-            ]
-          else
-            [ ]
-        );
-      binsShell = lib.concatStringsSep "\n" (map mkInstall bins);
-    in
-    ''
+  installPhase = ''
       runHook preInstall
-      ${binsShell}
+
+      mkdir -p $out
+      cp -a ./* $out/
 
     ''
     + lib.optionalString (version != "latest") ''
-      install -m755 -D ${moon-patched}/bin/moon $out/bin/moon
-      install -m755 -D ${moon-patched}/bin/moonrun $out/bin/moonrun
+      cp ${moon-patched}/bin/moon $out/bin/moon
+      cp ${moon-patched}/bin/moonrun $out/bin/moonrun
     ''
     + ''
+
+      chmod +x $out/bin/*
+      chmod +x $out/bin/internal/tcc
 
       runHook postInstall
     '';
