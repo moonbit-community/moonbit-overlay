@@ -5,6 +5,7 @@
   autoPatchelfHook,
   makeWrapper,
   libgcc,
+  tinycc,
   # manually
   moon-patched,
   version,
@@ -37,16 +38,18 @@ stdenv.mkDerivation {
 
       mkdir -p $out
       cp -a ./* $out/
+      chmod +x $out/bin/*
+      chmod +x $out/bin/internal/tcc
 
     ''
     + lib.optionalString (version != "latest") ''
       cp ${moon-patched}/bin/moon $out/bin/moon
       cp ${moon-patched}/bin/moonrun $out/bin/moonrun
+
+      rm $out/bin/internal/tcc
+      ln -sf ${tinycc.out}/bin/tcc $out/bin/internal/tcc
     ''
     + ''
-
-      chmod +x $out/bin/*
-      chmod +x $out/bin/internal/tcc
 
       runHook postInstall
     '';
