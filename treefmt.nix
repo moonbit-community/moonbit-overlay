@@ -9,6 +9,6 @@
   settings.global.excludes = [
     "LICENSE"
     "*.json"
-    ".envrc"
+    "**/.envrc"
   ];
 }
