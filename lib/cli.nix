@@ -14,7 +14,7 @@
   ...
 }:
 stdenv.mkDerivation {
-  pname = "moonbit-cli";
+  pname = "moonbit-toolchains";
   inherit version;
 
   src = fetchurl {
@@ -34,25 +34,25 @@ stdenv.mkDerivation {
   ];
 
   installPhase = ''
-      runHook preInstall
+    runHook preInstall
 
-      mkdir -p $out
-      cp -a ./* $out/
-      chmod +x $out/bin/*
-      chmod +x $out/bin/internal/tcc
+    mkdir -p $out
+    cp -a ./* $out/
+    chmod +x $out/bin/*
+    chmod +x $out/bin/internal/tcc
 
-    ''
-    + lib.optionalString (version != "latest") ''
-      cp ${moon-patched}/bin/moon $out/bin/moon
-      cp ${moon-patched}/bin/moonrun $out/bin/moonrun
+  ''
+  + lib.optionalString (version != "latest") ''
+    cp ${moon-patched}/bin/moon $out/bin/moon
+    cp ${moon-patched}/bin/moonrun $out/bin/moonrun
 
-      rm $out/bin/internal/tcc
-      ln -sf ${tinycc.out}/bin/tcc $out/bin/internal/tcc
-    ''
-    + ''
+    rm $out/bin/internal/tcc
+    ln -sf ${tinycc.out}/bin/tcc $out/bin/internal/tcc
+  ''
+  + ''
 
-      runHook postInstall
-    '';
+    runHook postInstall
+  '';
 
   meta = {
     homepage = "moonbitlang.com";
