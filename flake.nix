@@ -17,6 +17,7 @@
       inherit (nixpkgs) lib;
       forEachSystem = lib.genAttrs lib.systems.flakeExposed;
 
+      minVersion = "0.6.28";
       warnLsp =
         pkgs:
         lib.warn ''
@@ -34,7 +35,7 @@
           moonbit-bin =
             (prev.moonbit-bin or { })
             // import ./lib/moonbit-bin.nix {
-              inherit lib;
+              inherit lib minVersion;
               pkgs = final;
               versions = import ./versions.nix lib;
             }
@@ -55,7 +56,12 @@
       mkMoonbitBin =
         pkgs:
         import ./lib/moonbit-bin.nix {
-          inherit lib pkgs versions;
+          inherit
+            lib
+            pkgs
+            versions
+            minVersion
+            ;
         };
 
       treefmtEval = forEachSystem (
@@ -75,7 +81,7 @@
         in
         mkMoonbitBin pkgs
         // {
-          default = self.packages.${system}.moonbit.latest;
+          default = self.packages.${system}.moonbit_latest;
         }
         // {
           lsp = warnLsp pkgs;
