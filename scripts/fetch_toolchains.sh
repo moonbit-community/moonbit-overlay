@@ -5,7 +5,6 @@ latest_file="$toolchains_dir/latest.json"
 
 sedi="nix run nixpkgs#gnused -- -i"
 sednr="nix run nixpkgs#gnused -- -nr"
-jq="nix run nixpkgs#jq --"
 
 dash_to_underscore() {
     echo "$1" | tr '-' '_'
@@ -15,7 +14,7 @@ fetch-sha256() {
   uri="$1"
   name="$2"
   echo -e "\e[0;36mfetching \e[4;36m$uri\e[0;36m...\e[0m" > /dev/stderr
-  curl -o "$name" $uri
+  curl -o "$name" "$uri"
   hash=$(nix-hash --type sha256 --base64 --flat "$name")
   echo -e "\e[0;36mcalculated hash: \e[1;36m$hash\e[0m" > /dev/stderr
 
@@ -89,7 +88,7 @@ for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
     $sedi "s|coreHash\": \"sha256-.*\"|coreHash\": \"sha256-$target_hash\"|" $latest_file
 
     # update moon version
-    short_rev=$(echo $moon_version | sed -r 's/.*\((.*) .*\)/\1/')
+    short_rev=$(echo "$moon_version" | sed -r 's/.*\((.*) .*\)/\1/')
     $sedi "s|moonRev\": \".*\"|moonRev\": \"$short_rev\"|" $latest_file
 
     moon_hash=$(fetch-github-sha256 "moonbitlang" "moon" "$short_rev")
@@ -105,4 +104,4 @@ for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
   fi
 done
 
-echo done > /dev/stderr
+echo "done" > /dev/stderr
