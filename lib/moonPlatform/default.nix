@@ -24,8 +24,14 @@
 let
   inherit (import ../utils.nix { inherit stdenv lib; }) mkCliUri mkCoreUri target;
 
+  moon-patched = callPackage ./moon-patched {
+    rev = versions.${version}.moonRev;
+    hash = versions.${version}.moonHash;
+  };
+
   cli = callPackage ../cli.nix {
     inherit version;
+    moon-patched = moon-patched;
     url = mkCliUri version;
     hash = versions."${version}"."${target}-cliHash";
   };
