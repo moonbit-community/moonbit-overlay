@@ -16,8 +16,13 @@ let
       escapedRef = escape ref;
     in
     rec {
+      moon-patched.${escapedRef} = callPackage ./moon-patched {
+        rev = record.moonRev;
+        hash = record.moonHash;
+      };
       cli.${escapedRef} = callPackage ./cli.nix {
         inherit version;
+        moon-patched = moon-patched.${escapedRef};
         url = mkCliUri version;
         hash = record."${target}-cliHash";
       };

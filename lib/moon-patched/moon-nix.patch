@@ -1,0 +1,32 @@
+diff --git a/crates/moonutil/src/moon_dir.rs b/crates/moonutil/src/moon_dir.rs
+index 236fd9f..6b294f1 100644
+--- a/crates/moonutil/src/moon_dir.rs
++++ b/crates/moonutil/src/moon_dir.rs
+@@ -115,12 +115,25 @@ pub fn core_core(backend: TargetBackend) -> Vec<String> {
+     ]
+ }
+ 
++pub fn registry() -> PathBuf {
++    let env_var = std::env::var("MOON_REGISTRY_OVERRIDE");
++    if let Ok(path) = env_var {
++        return PathBuf::from(path);
++    }
++    let h = home::home_dir();
++    if h.is_none() {
++        eprintln!("Failed to get home directory");
++        std::process::exit(1);
++    }
++    h.unwrap().join(".moon").join("registry")
++}
++
+ pub fn cache() -> PathBuf {
+-    home().join("registry").join("cache")
++    registry().join("cache")
+ }
+ 
+ pub fn index() -> PathBuf {
+-    home().join("registry").join("index")
++    registry().join("index")
+ }
+ 
+ /// Get the path of the index file of a package. [`base`] should be the path of

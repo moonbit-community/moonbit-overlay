@@ -1,0 +1,11 @@
+{
+  "librusty_v8": {
+    "0.106.0": {
+      "x86_64-unknown-linux-gnu": "sha256-jLYl/CJp2Z+Ut6qZlh6u+CtR8KN+ToNTB+72QnVbIKM=",
+      "aarch64-apple-darwin": "sha256-pd/I6Mclj2/r/uJTIywnolPKYzeLu1c28d/6D56vkzQ="
+    }
+  },
+  "n2": {
+    "2cb2af63170acf3852c61326d5883a71f3576615": "sha256-DGixqPGqasiXdoRlpuJUYNOyVLHP/yVBkYt+Dhhe6Zk="
+  }
+}
