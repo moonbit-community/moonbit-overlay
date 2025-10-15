@@ -20,7 +20,11 @@ let
   librusty_v8_version = (lib.findFirst (x: x.name == "v8") { } cargoLockContents.package).version;
   n2_version = (lib.findFirst (x: x.name == "n2") { } cargoLockContents.package).version;
   n2_source = (lib.findFirst (x: x.name == "n2") { } cargoLockContents.package).source;
-  n2_rev = lib.substring 0 40 (lib.elemAt (lib.splitString "rev=" n2_source) 1);
+  # from git+https://github.com/moonbitlang/n2.git?rev=<commit>#<commit>
+  # to   git+https://github.com/moonbitlang/n2.git?rev=<commit>
+  # make it work with parseFlakeRef
+  n2_source_clean = builtins.elemAt (lib.splitString "#" n2_source) 0;
+  n2_rev = (builtins.parseFlakeRef n2_source_clean).rev;
 
   deps_versions = lib.importJSON ./deps_versions.json;
 in
