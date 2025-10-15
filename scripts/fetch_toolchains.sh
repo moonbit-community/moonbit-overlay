@@ -95,7 +95,7 @@ for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
     moon_hash=$(fetch-github-sha256 "moonbitlang" "moon" "$short_rev")
     $sedi "s|moonHash\": \"sha256-.*\"|moonHash\": \"sha256-$moon_hash\"|" $latest_file
 
-    echo "moon_revision=$rev" >> "$GITHUB_OUTPUT"
+    echo "moon_revision=$short_rev" >> "$GITHUB_OUTPUT"
 
     # pin
     cp $latest_file "$toolchains_dir/$run_version.json"
