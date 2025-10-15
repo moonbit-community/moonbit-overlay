@@ -36,24 +36,25 @@ stdenv.mkDerivation {
   installPhase =
     let
       mkInstall = bin: "install -m755 -D bin/${bin} $out/bin/${bin}";
-      bins = [
-        "moonfmt"
-        "mooninfo"
-        "mooncake"
-        "moon_cove_report"
-        "moonc"
-        "moondoc"
-        "moonbit-lsp"
-      ]
-      ++ (
-        if version == "latest" then
-          [
-            "moon"
-            "moonrun"
-          ]
-        else
-          [ ]
-      );
+      bins =
+        [
+          "moonfmt"
+          "mooninfo"
+          "mooncake"
+          "moon_cove_report"
+          "moonc"
+          "moondoc"
+          "moonbit-lsp"
+        ]
+        ++ (
+          if version == "latest" then
+            [
+              "moon"
+              "moonrun"
+            ]
+          else
+            [ ]
+        );
       binsShell = lib.concatStringsSep "\n" (map mkInstall bins);
     in
     ''

@@ -7,7 +7,12 @@
 let
   inherit (pkgs) callPackage;
 
-  inherit (callPackage ./utils.nix { }) mkCliUri target escape mkCoreUri;
+  inherit (callPackage ./utils.nix { })
+    mkCliUri
+    target
+    escape
+    mkCoreUri
+    ;
 
   mk =
     ref: record:
