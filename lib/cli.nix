@@ -68,8 +68,6 @@ stdenv.mkDerivation {
     ''
     + ''
 
-      wrapProgram "$out/bin/moonbit-lsp" \
-        --prefix PATH ":" ${lib.makeBinPath [ nodejs ]}
       runHook postInstall
     '';
 
