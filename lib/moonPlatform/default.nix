@@ -24,7 +24,7 @@
 let
   inherit (import ../utils.nix { inherit stdenv lib; }) mkToolChainsUri mkCoreUri target;
 
-  moon-patched = callPackage ./moon-patched {
+  moon-patched = callPackage ../moon-patched {
     rev = versions.${version}.moonRev;
     hash = versions.${version}.moonHash;
   };

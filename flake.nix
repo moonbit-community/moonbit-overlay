@@ -17,11 +17,8 @@
       inherit (nixpkgs) lib;
       forEachSystem = lib.genAttrs lib.systems.flakeExposed;
 
-      lsp = lib.warn ''
-        moonbit-overlay: 'lsp' is deprecated and has been removed.
-        The moonbit-bin.moonbit.$${version} package already includes moonbit-lsp.
-        For more information, see: https://github.com/moonbit-community/moonbit-overlay/pull/14
-      '' null;
+      minVersion = "0.6.28";
+      deprecated = import ./deprecated.nix lib;
 
       overlay = (
         final: prev:
@@ -31,14 +28,12 @@
         rec {
           moonbit-bin =
             (prev.moonbit-bin or { })
-            // import ./lib/moonbit-bin.nix {
-              inherit lib;
+            // (import ./lib/moonbit-bin.nix {
+              inherit lib minVersion;
               pkgs = final;
               versions = import ./versions.nix lib;
-            }
-            // {
-              inherit lsp;
-            };
+            }).legacyPackages
+            // deprecated;
           moonbit-lang = final.callPackage ./lib/compiler.nix { };
 
           mkMoonPlatform = final.callPackage ./lib/moonPlatform {
@@ -50,11 +45,26 @@
       );
 
       versions = import ./versions.nix lib;
-      mkMoonbitBin =
+      mkMoonbitBinPackages =
         pkgs:
-        import ./lib/moonbit-bin.nix {
-          inherit lib pkgs versions;
-        };
+        (import ./lib/moonbit-bin.nix {
+          inherit
+            lib
+            pkgs
+            versions
+            minVersion
+            ;
+        }).packages;
+      mkMoonbitBinLegacyPackages =
+        pkgs:
+        (import ./lib/moonbit-bin.nix {
+          inherit
+            lib
+            pkgs
+            versions
+            minVersion
+            ;
+        }).legacyPackages;
 
       treefmtEval = forEachSystem (
         system: treefmt-nix.lib.evalModule (nixpkgs.legacyPackages.${system}) ./treefmt.nix
@@ -71,18 +81,23 @@
         let
           pkgs = nixpkgs.legacyPackages.${system};
         in
-        mkMoonbitBin pkgs
+        mkMoonbitBinPackages pkgs
         // {
-          default = self.packages.${system}.moonbit.latest;
+          default = self.packages.${system}.moonbit_latest;
         }
-        // {
-          inherit lsp;
-        }
+        // deprecated
         // {
           # compiler build from source
           # not used now
           compiler = pkgs.callPackage ./lib/compiler.nix { };
         }
+      );
+      legacyPackages = forEachSystem (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        mkMoonbitBinLegacyPackages pkgs // deprecated
       );
 
       apps = forEachSystem (

@@ -2,6 +2,7 @@
   lib,
   pkgs,
   versions,
+  minVersion,
 }:
 
 let
@@ -19,28 +20,59 @@ let
     let
       version = record.version;
       escapedRef = escape ref;
+      warnObsolete = lib.warnOnInstantiate "moonbit-bin: version `${version}` is obsolete, please upgrade to at least ${minVersion}" pkgs.emptyFile;
     in
-    rec {
-      moon-patched.${escapedRef} = callPackage ./moon-patched {
-        rev = record.moonRev;
-        hash = record.moonHash;
-      };
-      toolchains.${escapedRef} = callPackage ./toolchains.nix {
-        inherit version;
-        moon-patched = moon-patched.${escapedRef};
-        url = mkToolChainsUri version;
-        hash = record."${target}-toolchainsHash";
-      };
-      core.${escapedRef} = callPackage ./core.nix {
-        inherit version;
-        url = mkCoreUri version;
-        hash = record.coreHash;
+    if lib.versionOlder (lib.removePrefix "v" version) minVersion then
+      {
+        moon-patched.${escapedRef} = warnObsolete;
+        toolchains.${escapedRef} = warnObsolete;
+        core.${escapedRef} = warnObsolete;
+        moonbit.${escapedRef} = warnObsolete;
+      }
+    else
+      rec {
+        moon-patched.${escapedRef} = callPackage ./moon-patched {
+          rev = record.moonRev;
+          hash = record.moonHash;
+        };
+        toolchains.${escapedRef} = callPackage ./toolchains.nix {
+          inherit version;
+          moon-patched = moon-patched.${escapedRef};
+          url = mkToolChainsUri version;
+          hash = record."${target}-toolchainsHash";
+        };
+        core.${escapedRef} = callPackage ./core.nix {
+          inherit version;
+          url = mkCoreUri version;
+          hash = record.coreHash;
+        };
+
+        moonbit.${escapedRef} = callPackage ./bundle.nix {
+          toolchains = toolchains."${escapedRef}";
+          core = core."${escapedRef}";
+        };
       };
 
-      moonbit.${escapedRef} = callPackage ./bundle.nix {
-        toolchains = toolchains."${escapedRef}";
-        core = core."${escapedRef}";
-      };
-    };
+  flattenAttrs = lib.foldl' (
+    acc: item:
+    acc
+    // (builtins.listToAttrs (
+      builtins.concatMap (
+        pkgType:
+        let
+          pkgVersions = item.${pkgType};
+        in
+        lib.mapAttrsToList (ver: val: {
+          name = "${pkgType}_${ver}";
+          value = val;
+        }) pkgVersions
+      ) (builtins.attrNames item)
+    ))
+  ) { };
+
+  versionPkgs = builtins.attrValues (lib.mapAttrs mk versions);
 in
-builtins.foldl' lib.recursiveUpdate { } (builtins.attrValues (lib.mapAttrs mk versions))
+{
+  packages = flattenAttrs versionPkgs;
+  legacyPackages = builtins.foldl' lib.recursiveUpdate { } versionPkgs;
+}
