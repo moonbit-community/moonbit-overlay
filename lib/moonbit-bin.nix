@@ -20,12 +20,12 @@ let
     let
       version = record.version;
       escapedRef = escape ref;
-      warnObsolete = lib.warn "moonbit-bin: version is obsolete, please upgrade to at least ${minVersion}" pkgs.emptyFile;
+      warnObsolete = lib.warnOnInstantiate "moonbit-bin: version `${version}` is obsolete, please upgrade to at least ${minVersion}" pkgs.emptyFile;
     in
     if lib.versionOlder (lib.removePrefix "v" version) minVersion then
       {
         moon-patched.${escapedRef} = warnObsolete;
-        cli.${escapedRef} = warnObsolete;
+        toolchains.${escapedRef} = warnObsolete;
         core.${escapedRef} = warnObsolete;
         moonbit.${escapedRef} = warnObsolete;
       }
@@ -35,11 +35,11 @@ let
           rev = record.moonRev;
           hash = record.moonHash;
         };
-        cli.${escapedRef} = callPackage ./cli.nix {
+        toolchains.${escapedRef} = callPackage ./toolchains.nix {
           inherit version;
           moon-patched = moon-patched.${escapedRef};
           url = mkToolChainsUri version;
-          hash = record."${target}-cliHash";
+          hash = record."${target}-toolchainsHash";
         };
         core.${escapedRef} = callPackage ./core.nix {
           inherit version;
@@ -48,7 +48,7 @@ let
         };
 
         moonbit.${escapedRef} = callPackage ./bundle.nix {
-          cli = cli."${escapedRef}";
+          toolchains = toolchains."${escapedRef}";
           core = core."${escapedRef}";
         };
       };
