@@ -10,18 +10,19 @@ rec {
     .${stdenv.hostPlatform.system} or (throw "Unsupported platform: ${stdenv.hostPlatform.system}");
 
   mkVersion = lib.escapeURL;
+  latestVersion = (lib.importJSON ../versions/toolchains/latest.json).version;
   mkCoreUri =
     version:
-    if version == "latest" then
-      "${moonbitUri}/cores/core-latest.tar.gz"
-    else
-      "https://github.com/moonbit-community/moonbit-overlay/releases/download/${mkVersion version}/moonbit-core.tar.gz";
+    let
+      version' = if version == "latest" then latestVersion else version;
+    in
+    "https://github.com/moonbit-community/moonbit-overlay/releases/download/${mkVersion version'}/moonbit-core.tar.gz";
   mkToolChainsUri =
     version:
-    if version == "latest" then
-      "${moonbitUri}/binaries/latest/moonbit-${target}.tar.gz"
-    else
-      "https://github.com/moonbit-community/moonbit-overlay/releases/download/${mkVersion version}/moonbit-${target}.tar.gz";
+    let
+      version' = if version == "latest" then latestVersion else version;
+    in
+    "https://github.com/moonbit-community/moonbit-overlay/releases/download/${mkVersion version'}/moonbit-${target}.tar.gz";
   escape =
     let
       escapeFrom = [
