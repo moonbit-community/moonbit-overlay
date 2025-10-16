@@ -68,5 +68,10 @@ let
       ) (builtins.attrNames item)
     ))
   ) { };
+
+  versionPkgs = builtins.attrValues (lib.mapAttrs mk versions);
 in
-flattenAttrs (builtins.attrValues (lib.mapAttrs mk versions))
+{
+  packages = flattenAttrs versionPkgs;
+  legacyPackages = builtins.foldl' lib.recursiveUpdate { } versionPkgs;
+}

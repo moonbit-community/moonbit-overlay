@@ -34,11 +34,11 @@
         rec {
           moonbit-bin =
             (prev.moonbit-bin or { })
-            // import ./lib/moonbit-bin.nix {
+            // (import ./lib/moonbit-bin.nix {
               inherit lib minVersion;
               pkgs = final;
               versions = import ./versions.nix lib;
-            }
+            }).legacyPackages
             // {
               lsp = warnLsp final;
             };
@@ -53,16 +53,26 @@
       );
 
       versions = import ./versions.nix lib;
-      mkMoonbitBin =
+      mkMoonbitBinPackages =
         pkgs:
-        import ./lib/moonbit-bin.nix {
+        (import ./lib/moonbit-bin.nix {
           inherit
             lib
             pkgs
             versions
             minVersion
             ;
-        };
+        }).packages;
+      mkMoonbitBinLagecyPackages =
+        pkgs:
+        (import ./lib/moonbit-bin.nix {
+          inherit
+            lib
+            pkgs
+            versions
+            minVersion
+            ;
+        }).legacyPackages;
 
       treefmtEval = forEachSystem (
         system: treefmt-nix.lib.evalModule (nixpkgs.legacyPackages.${system}) ./treefmt.nix
@@ -79,7 +89,7 @@
         let
           pkgs = nixpkgs.legacyPackages.${system};
         in
-        mkMoonbitBin pkgs
+        mkMoonbitBinPackages pkgs
         // {
           default = self.packages.${system}.moonbit_latest;
         }
@@ -91,6 +101,13 @@
           # not used now
           compiler = pkgs.callPackage ./lib/compiler.nix { };
         }
+      );
+      legacyPackages = forEachSystem (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        mkMoonbitBinLagecyPackages pkgs
       );
 
       apps = forEachSystem (
