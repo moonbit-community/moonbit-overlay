@@ -20,13 +20,14 @@ let
     let
       version = record.version;
       escapedRef = escape ref;
+      warnObsolete = lib.warn "moonbit-bin: version is obsolete, please upgrade to at least ${minVersion}" pkgs.emptyFile;
     in
     if lib.versionOlder (lib.removePrefix "v" version) minVersion then
       {
-        moon-patched.${escapedRef} = pkgs.emptyFile;
-        cli.${escapedRef} = pkgs.emptyFile;
-        core.${escapedRef} = pkgs.emptyFile;
-        moonbit.${escapedRef} = pkgs.emptyFile;
+        moon-patched.${escapedRef} = warnObsolete;
+        cli.${escapedRef} = warnObsolete;
+        core.${escapedRef} = warnObsolete;
+        moonbit.${escapedRef} = warnObsolete;
       }
     else
       rec {
