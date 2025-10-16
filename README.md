@@ -154,6 +154,17 @@ Check available versions in the [directory](versions/).
 > for convenience, we [escape](https://github.com/jetjinser/moonbit-overlay/blob/3464a68cf9a16d4d63f76de823ca9687bca2de2d/lib/moonbit-bin.nix#L22-L24)
 > it to format like `v0_1_20241031-7204facb6`.
 
+## legacyPackages & packages
+
+The overlay now provides both `legacyPackages` and `packages` attributes:
+
+- **legacyPackages**: This is the original, structured attribute set. Packages are grouped by type (e.g., `moonbit`, `cli`, `core`) and version, making it easier to navigate the package hierarchy.
+- **packages**: This is a flattened attribute set, where each package is exposed as a single attribute (e.g., `moonbit_latest`, `cli_v0_1_20241031-7204facb6`). This structure is required for `nix flake check` to work correctly, as it expects all packages to be directly accessible under the `packages` attribute.
+
+Both are provided to maintain compatibility and usability: use `legacyPackages` for structured access, and `packages` for flake checks and direct access.
+
+Some deprecated packages are still exposed for compatibility; attempting to use them will show a warning and prevent building.
+
 ## TODO
 
 - [ ] overridable
