@@ -16,7 +16,7 @@ rec {
       "${moonbitUri}/cores/core-latest.tar.gz"
     else
       "https://github.com/moonbit-community/moonbit-overlay/releases/download/${mkVersion version}/moonbit-core.tar.gz";
-  mkCliUri =
+  mkToolChainsUri =
     version:
     if version == "latest" then
       "${moonbitUri}/binaries/latest/moonbit-${target}.tar.gz"

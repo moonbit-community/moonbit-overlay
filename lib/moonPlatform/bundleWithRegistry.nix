@@ -2,7 +2,7 @@
 {
   symlinkJoin,
   makeWrapper,
-  cli,
+  toolchains,
   core,
 }:
 {
@@ -12,7 +12,7 @@
 symlinkJoin {
   name = "moonPlatform-moonHome";
   paths = [
-    cli
+    toolchains
     core
     cachedRegistry
   ];
@@ -24,9 +24,9 @@ symlinkJoin {
   postBuild = ''
     export MOON_HOME=$out
 
-    PATH=$out/bin $out/bin/${cli.meta.mainProgram} bundle --all --source-dir $out/lib/core
+    PATH=$out/bin $out/bin/${toolchains.meta.mainProgram} bundle --all --source-dir $out/lib/core
 
-    wrapProgram $out/bin/${cli.meta.mainProgram} \
+    wrapProgram $out/bin/${toolchains.meta.mainProgram} \
       --set MOON_HOME $out
   '';
 }
