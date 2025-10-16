@@ -5,7 +5,6 @@ on:
     branches:
       - '**'
 
-permissions: read
 jobs:
   flake-check:
     runs-on: ubuntu-latest
