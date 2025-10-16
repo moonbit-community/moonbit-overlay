@@ -4,7 +4,7 @@
 #    ./parseMoonIndex.nix
 #    ./listAllDependencies.nix
 # 2. Fetch all dependencies into $MOON_HOME/registry/cache
-# 3. Bundle core, cli and cached registry
+# 3. Bundle core, toolchains and cached registry
 # 4. Build moon package with bundled $MOON_HOME
 {
   lib,
@@ -22,18 +22,17 @@
   version,
 }:
 let
-  inherit (import ../utils.nix { inherit stdenv lib; }) mkCliUri mkCoreUri target;
+  inherit (import ../utils.nix { inherit stdenv lib; }) mkToolChainsUri mkCoreUri target;
 
   moon-patched = callPackage ./moon-patched {
     rev = versions.${version}.moonRev;
     hash = versions.${version}.moonHash;
   };
 
-  cli = callPackage ../cli.nix {
-    inherit version;
-    moon-patched = moon-patched;
-    url = mkCliUri version;
-    hash = versions."${version}"."${target}-cliHash";
+  toolchains = callPackage ../toolchains.nix {
+    inherit version moon-patched;
+    url = mkToolChainsUri version;
+    hash = versions."${version}"."${target}-toolchainsHash";
   };
 
   core = callPackage ../core.nix {
@@ -67,7 +66,7 @@ let
     inherit
       symlinkJoin
       makeWrapper
-      cli
+      toolchains
       core
       ;
   };

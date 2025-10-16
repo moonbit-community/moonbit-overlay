@@ -36,8 +36,8 @@ fetch-github-sha256() {
 run_version=""
 old_version=$($sednr 's|^\s*"version\": \"(.*)\",$|\1|p' $latest_file)
 for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
-  target_uri="$(dash_to_underscore $target)_cli_uri"
-  target_hash="$(dash_to_underscore $target)_cliHash"
+  target_uri="$(dash_to_underscore $target)_toolchains_uri"
+  target_hash="$(dash_to_underscore $target)_toolchainsHash"
   # phase 0
   uri="https://cli.moonbitlang.com"
 
@@ -46,7 +46,7 @@ for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
   target_hash=$(fetch-sha256 $target_uri "moonbit-$target.tar.gz")
 
   $sedi "s|version\": \".*\"|version\": \"latest\"|" $latest_file
-  $sedi "s|$target-cliHash\": \"sha256-.*\"|$target-cliHash\": \"sha256-$target_hash\"|" $latest_file
+  $sedi "s|$target-toolchainsHash\": \"sha256-.*\"|$target-toolchainsHash\": \"sha256-$target_hash\"|" $latest_file
 
   # phase 1
 

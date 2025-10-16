@@ -3,7 +3,7 @@
   symlinkJoin,
   makeWrapper,
   # manually
-  cli,
+  toolchains,
   core,
   ...
 }:
@@ -11,7 +11,7 @@
 symlinkJoin {
   name = "moonbit";
   paths = [
-    cli
+    toolchains
     core
   ];
 
@@ -22,9 +22,9 @@ symlinkJoin {
   postBuild = ''
     export MOON_HOME=$out
 
-    PATH=$out/bin $out/bin/${cli.meta.mainProgram} bundle --all --source-dir $out/lib/core
+    PATH=$out/bin $out/bin/${toolchains.meta.mainProgram} bundle --all --source-dir $out/lib/core
 
-    wrapProgram $out/bin/${cli.meta.mainProgram} \
+    wrapProgram $out/bin/${toolchains.meta.mainProgram} \
       --set MOON_HOME $out
 
     # patch the lsp to use the correct node and MOON_HOME

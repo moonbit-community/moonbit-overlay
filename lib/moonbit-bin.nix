@@ -8,7 +8,7 @@ let
   inherit (pkgs) callPackage;
 
   inherit (callPackage ./utils.nix { })
-    mkCliUri
+    mkToolChainsUri
     target
     escape
     mkCoreUri
@@ -25,11 +25,11 @@ let
         rev = record.moonRev;
         hash = record.moonHash;
       };
-      cli.${escapedRef} = callPackage ./cli.nix {
+      toolchains.${escapedRef} = callPackage ./toolchains.nix {
         inherit version;
         moon-patched = moon-patched.${escapedRef};
-        url = mkCliUri version;
-        hash = record."${target}-cliHash";
+        url = mkToolChainsUri version;
+        hash = record."${target}-toolchainsHash";
       };
       core.${escapedRef} = callPackage ./core.nix {
         inherit version;
@@ -38,7 +38,7 @@ let
       };
 
       moonbit.${escapedRef} = callPackage ./bundle.nix {
-        cli = cli."${escapedRef}";
+        toolchains = toolchains."${escapedRef}";
         core = core."${escapedRef}";
       };
     };
