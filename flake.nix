@@ -18,13 +18,7 @@
       forEachSystem = lib.genAttrs lib.systems.flakeExposed;
 
       minVersion = "0.6.28";
-      warnLsp =
-        pkgs:
-        lib.warn ''
-          moonbit-overlay: 'lsp' is deprecated and has been removed.
-          The moonbit-bin.moonbit.<version> package already includes moonbit-lsp.
-          For more information, see: https://github.com/moonbit-community/moonbit-overlay/pull/14
-        '' pkgs.emptyFile;
+      deprecated = import ./deprecated.nix lib;
 
       overlay = (
         final: prev:
@@ -39,9 +33,7 @@
               pkgs = final;
               versions = import ./versions.nix lib;
             }).legacyPackages
-            // {
-              lsp = warnLsp final;
-            };
+            // deprecated;
           moonbit-lang = final.callPackage ./lib/compiler.nix { };
 
           mkMoonPlatform = final.callPackage ./lib/moonPlatform {
@@ -93,9 +85,7 @@
         // {
           default = self.packages.${system}.moonbit_latest;
         }
-        // {
-          lsp = warnLsp pkgs;
-        }
+        // deprecated
         // {
           # compiler build from source
           # not used now
@@ -107,7 +97,7 @@
         let
           pkgs = nixpkgs.legacyPackages.${system};
         in
-        mkMoonbitBinLagecyPackages pkgs
+        mkMoonbitBinLagecyPackages pkgs // deprecated
       );
 
       apps = forEachSystem (
