@@ -1,0 +1,22 @@
+name: Nix Flake Check
+
+on:
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  flake-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v25
+        with:
+          nix_path: nixpkgs=channel:nixpkgs-unstable
+
+      - name: Run nix flake check
+        run: nix flake check
+
