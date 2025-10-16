@@ -55,7 +55,7 @@
             minVersion
             ;
         }).packages;
-      mkMoonbitBinLagecyPackages =
+      mkMoonbitBinLegacyPackages =
         pkgs:
         (import ./lib/moonbit-bin.nix {
           inherit
@@ -97,7 +97,7 @@
         let
           pkgs = nixpkgs.legacyPackages.${system};
         in
-        mkMoonbitBinLagecyPackages pkgs // deprecated
+        mkMoonbitBinLegacyPackages pkgs // deprecated
       );
 
       apps = forEachSystem (
