@@ -22,7 +22,15 @@ let
       escapedRef = escape ref;
       warnObsolete = lib.warnOnInstantiate "moonbit-bin: version `${version}` is obsolete, please upgrade to at least ${minVersion}" pkgs.emptyFile;
     in
-    if lib.versionOlder (lib.removePrefix "v" version) minVersion then
+    if
+      (
+        !(builtins.elem version [
+          "latest"
+          "updating"
+        ])
+        && lib.versionOlder (lib.removePrefix "v" version) minVersion
+      )
+    then
       {
         moon-patched.${escapedRef} = warnObsolete;
         toolchains.${escapedRef} = warnObsolete;

@@ -45,7 +45,7 @@ for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
 
   target_hash=$(fetch-sha256 $target_uri "moonbit-$target.tar.gz")
 
-  $sedi "s|version\": \".*\"|version\": \"latest\"|" $latest_file
+  $sedi "s|version\": \".*\"|version\": \"updating\"|" $latest_file
   $sedi "s|$target-toolchainsHash\": \"sha256-.*\"|$target-toolchainsHash\": \"sha256-$target_hash\"|" $latest_file
 
   # phase 1

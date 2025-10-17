@@ -11,18 +11,26 @@ rec {
 
   mkVersion = lib.escapeURL;
   latestVersion = (lib.importJSON ../versions/toolchains/latest.json).version;
+  # TODO(jinser): Refactoring to less messy code
+  # TODO(jinser): documentation somewhere
   mkCoreUri =
     version:
     let
       version' = if version == "latest" then latestVersion else version;
     in
-    "https://github.com/moonbit-community/moonbit-overlay/releases/download/${mkVersion version'}/moonbit-core.tar.gz";
+    if version' == "updating" then
+      "${moonbitUri}/cores/core-latest.tar.gz"
+    else
+      "https://github.com/moonbit-community/moonbit-overlay/releases/download/${mkVersion version'}/moonbit-core.tar.gz";
   mkToolChainsUri =
     version:
     let
       version' = if version == "latest" then latestVersion else version;
     in
-    "https://github.com/moonbit-community/moonbit-overlay/releases/download/${mkVersion version'}/moonbit-${target}.tar.gz";
+    if version' == "updating" then
+      "${moonbitUri}/binaries/latest/moonbit-${target}.tar.gz"
+    else
+      "https://github.com/moonbit-community/moonbit-overlay/releases/download/${mkVersion version'}/moonbit-${target}.tar.gz";
   escape =
     let
       escapeFrom = [
