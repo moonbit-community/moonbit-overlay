@@ -50,12 +50,12 @@ jobs:
 
     - name: Prefetch latest MoonBit
       id: fetch_toolchains
-      timeout-minutes: 5
+      timeout-minutes: 10
       run: ./scripts/fetch_toolchains.sh
 
     - name: Prefetch latest Moon Patched Deps
       if: steps.fetch_toolchains.outputs.skipped != 'true'
-      timeout-minutes: 5
+      timeout-minutes: 10
       run: ./lib/moon-patched/update.sh
       env:
         REVISION: ${{ steps.fetch_toolchains.outputs.moon_revision }}
