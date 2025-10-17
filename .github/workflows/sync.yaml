@@ -5,6 +5,14 @@ on:
 
   workflow_dispatch:
 
+  push:
+    branches:
+      - master
+    paths:
+      - .github/workflows/sync.yaml
+      - scripts/fetch_toolchains.sh
+      - lib/moon-patched/update.sh
+
 permissions:
   contents: write
 
