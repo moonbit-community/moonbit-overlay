@@ -94,5 +94,6 @@ jobs:
       uses: ncipollo/release-action@v1
       with:
         tag: ${{ steps.fetch_toolchains.outputs.version }}
+        immutableCreate: true
         body: "New version ${{ steps.fetch_toolchains.outputs.version }} fetched from MoonBit."
         artifacts: "moonbit-linux-x86_64.tar.gz, moonbit-darwin-aarch64.tar.gz, moonbit-core.tar.gz"
