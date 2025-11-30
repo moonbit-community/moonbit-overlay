@@ -60,6 +60,17 @@ for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
     if [ -z "${run_version}" ] || [ -z "${moon_version}" ]; then
       run_version=$(nix run .\#moonc -- -v)
       moon_version=$(nix run .\#moon version)
+
+      # remove the date suffix after the whitespace
+      if [[ "$run_version" == *" "* ]]; then
+        run_version="${run_version%% *}"
+      fi
+
+      # append moon git short rev (short_rev) to run_version
+      short_rev=$(echo "$moon_version" | sed -r 's/.*\((.*) .*\)/\1/')
+      if [ -n "$short_rev" ]; then
+        run_version="${run_version}+${short_rev}"
+      fi
     fi
 
     if [ -z "${run_version}" ] || [ -z "${moon_version}" ]; then
@@ -67,10 +78,6 @@ for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
       exit 1
     fi
 
-    # remove the date suffix after the whitespace
-    if [[ "$run_version" == *" "* ]]; then
-      run_version="${run_version%% *}"
-    fi
     echo -e "\e[0;36mcurrent version: \e[1;36m$run_version\e[0m" > /dev/stderr
 
     # skip if version not changed
@@ -88,7 +95,6 @@ for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
     $sedi "s|coreHash\": \"sha256-.*\"|coreHash\": \"sha256-$target_hash\"|" $latest_file
 
     # update moon version
-    short_rev=$(echo "$moon_version" | sed -r 's/.*\((.*) .*\)/\1/')
     $sedi "s|moonRev\": \".*\"|moonRev\": \"$short_rev\"|" $latest_file
 
     moon_hash=$(fetch-github-sha256 "moonbitlang" "moon" "$short_rev")
