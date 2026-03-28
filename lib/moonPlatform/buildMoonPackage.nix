@@ -37,6 +37,21 @@ let
 
       effectiveTarget = if moonTarget != null then moonTarget else preferredTarget;
 
+      # Reverse-lookup: find a nixpkgs license by its SPDX identifier
+      findLicenseBySpdxId =
+        spdxId:
+        let
+          all = builtins.attrValues lib.licenses;
+          matches = builtins.filter (l: (l.spdxId or "") == spdxId) all;
+        in
+        if matches != [ ] then builtins.head matches else null;
+
+      derivedLicense = if moonMod ? license then findLicenseBySpdxId moonMod.license else null;
+      derivedMeta =
+        lib.optionalAttrs (moonMod ? description) { description = moonMod.description; }
+        // lib.optionalAttrs (moonMod ? repository) { homepage = moonMod.repository; }
+        // lib.optionalAttrs (derivedLicense != null) { license = derivedLicense; };
+
       cachedRegistry = buildCachedRegistry {
         inherit moonModJson;
         registryIndexSrc = moonRegistryIndex;
@@ -97,6 +112,7 @@ let
         name = args.name or derivedName;
         version = args.version or derivedVersion;
         inherit nativeBuildInputs env;
+        meta = derivedMeta // (args.meta or { });
         unpackPhase = args.unpackPhase or unpackPhase;
         buildPhase = args.buildPhase or buildPhase;
         installPhase = args.installPhase or installPhase;
