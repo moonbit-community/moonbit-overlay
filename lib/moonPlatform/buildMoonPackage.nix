@@ -1,5 +1,14 @@
 # Main builder of moonPlatform.
-# TODO: Build target specific control of $out destination.
+#
+# Reads moon.mod.json to determine version, source directory, and preferred
+# build target so callers need minimal configuration:
+#
+#   pkgs.moonPlatform.buildMoonPackage {
+#     name = "my-app";
+#     src = ./.;
+#     moonModJson = ./moon.mod.json;
+#     moonRegistryIndex = inputs.moon-registry;
+#   }
 {
   lib,
   stdenv,
@@ -13,9 +22,20 @@ let
       moonModJson,
       moonRegistryIndex,
       moonFlags ? [ ],
+      moonMainPkg ? null,
+      moonTarget ? null,
       ...
     }@args:
     let
+      moonMod = builtins.fromJSON (builtins.readFile moonModJson);
+
+      # Auto-detect from moon.mod.json
+      derivedVersion = moonMod.version or "0.0.0";
+      sourceDir = moonMod.source or "src";
+      preferredTarget = moonMod.preferred-target or "native";
+
+      effectiveTarget = if moonTarget != null then moonTarget else preferredTarget;
+
       cachedRegistry = buildCachedRegistry {
         inherit moonModJson;
         registryIndexSrc = moonRegistryIndex;
@@ -24,10 +44,12 @@ let
         inherit cachedRegistry;
       };
       nativeBuildInputs = lib.lists.unique ((args.nativeBuildInputs or [ ]) ++ [ moonHome ]);
+
       unpackPhase = ''
         mkdir -p $TMP
         cp -r $src/* $TMP
       '';
+
       buildPhase = ''
         cd $TMP
 
@@ -39,19 +61,39 @@ let
         export MOON_HOME=$writable_home
         export HOME=$TMPDIR
 
-        moon build ${lib.concatStringsSep " " moonFlags}
+        moon build \
+          --target ${effectiveTarget} \
+          --release \
+          ${lib.concatStringsSep " " moonFlags}
       '';
+
+      # Find and install all executable binaries produced by the build.
       installPhase = ''
-        mkdir -p $out
-        cp -r $TMP/_build/ $out/
+        mkdir -p $out/bin
+        find $TMP/_build/${effectiveTarget}/release/build/ \
+          -name '*.exe' -type f -perm -0111 \
+          -exec sh -c '
+            for f; do
+              base="$(basename "$f" .exe)"
+              install -Dm755 "$f" "$out/bin/$base"
+            done
+          ' _ {} +
       '';
+
       env = (args.env or { }) // {
         MOON_HOME = "${moonHome}";
       };
     in
     stdenv.mkDerivation (
-      args
+      (builtins.removeAttrs args [
+        "moonModJson"
+        "moonRegistryIndex"
+        "moonFlags"
+        "moonMainPkg"
+        "moonTarget"
+      ])
       // {
+        version = args.version or derivedVersion;
         inherit nativeBuildInputs env;
         unpackPhase = args.unpackPhase or unpackPhase;
         buildPhase = args.buildPhase or buildPhase;
