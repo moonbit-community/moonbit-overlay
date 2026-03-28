@@ -18,8 +18,9 @@ let
         headIndexRecords = builtins.readFile "${registryIndexSrc}/user/${head.name}.index";
         headIndex = parseMoonIndex headIndexRecords;
         headDependency = headIndex.${head.version};
+        depKey = "${head.name}@${head.version}";
         resolvedDependencies' = resolvedDependencies // {
-          head.name = head.version;
+          "${depKey}" = true;
         };
         unresolvedDependencies' =
           tail
@@ -30,6 +31,6 @@ let
           resolvedDependencies = resolvedDependencies';
         };
       in
-      if builtins.hasAttr head.name resolvedDependencies then next else next ++ [ headDependency ];
+      if builtins.hasAttr depKey resolvedDependencies then next else next ++ [ headDependency ];
 in
 listAllDependencies

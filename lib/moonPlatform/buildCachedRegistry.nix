@@ -38,8 +38,7 @@ let
           };
         in
         ''
-          mkdir -p $out/registry/cache/${dep.name}
-          cp ${cache} $out/registry/cache/${dep.name}/${dep.version}.zip
+          install -Dm644 ${cache} $out/registry/cache/${dep.name}/${dep.version}.zip
         ''
       ) dependencyList);
   };
