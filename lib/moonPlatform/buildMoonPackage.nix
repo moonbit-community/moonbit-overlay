@@ -30,11 +30,20 @@ let
       '';
       buildPhase = ''
         cd $TMP
+
+        # MOON_HOME from the nix store is read-only; moon needs to write
+        # build caches and package metadata there, so create a writable copy.
+        writable_home=$TMPDIR/moon_home
+        cp -rL $MOON_HOME $writable_home
+        chmod -R u+w $writable_home
+        export MOON_HOME=$writable_home
+        export HOME=$TMPDIR
+
         moon build ${lib.concatStringsSep " " moonFlags}
       '';
       installPhase = ''
         mkdir -p $out
-        cp -r $TMP/target/ $out/
+        cp -r $TMP/_build/ $out/
       '';
       env = (args.env or { }) // {
         MOON_HOME = "${moonHome}";
