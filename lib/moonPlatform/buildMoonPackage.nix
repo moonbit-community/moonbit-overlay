@@ -4,7 +4,6 @@
 # build target so callers need minimal configuration:
 #
 #   pkgs.moonPlatform.buildMoonPackage {
-#     name = "my-app";
 #     src = ./.;
 #     moonModJson = ./moon.mod.json;
 #     moonRegistryIndex = inputs.moon-registry;
@@ -30,6 +29,8 @@ let
       moonMod = builtins.fromJSON (builtins.readFile moonModJson);
 
       # Auto-detect from moon.mod.json
+      # name is "owner/repo" in moon.mod.json; use the last component
+      derivedName = lib.last (lib.splitString "/" (moonMod.name or "moon-package"));
       derivedVersion = moonMod.version or "0.0.0";
       sourceDir = moonMod.source or "src";
       preferredTarget = moonMod.preferred-target or "native";
@@ -93,6 +94,7 @@ let
         "moonTarget"
       ])
       // {
+        name = args.name or derivedName;
         version = args.version or derivedVersion;
         inherit nativeBuildInputs env;
         unpackPhase = args.unpackPhase or unpackPhase;

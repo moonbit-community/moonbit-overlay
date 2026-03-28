@@ -105,7 +105,6 @@ directory — minimal configuration is needed:
         };
 
         packages.default = pkgs.moonPlatform.buildMoonPackage {
-          name = "my-brilliant-moonbit-project";
           src = ./.;
           moonModJson = ./moon.mod.json;
           moonRegistryIndex = inputs.moon-registry;
@@ -132,6 +131,7 @@ directory — minimal configuration is needed:
 
 | Parameter            | Default                             | Description                                    |
 | -------------------- | ----------------------------------- | ---------------------------------------------- |
+| `name`               | from `moon.mod.json`                | Derivation name (last component of mod name)   |
 | `version`            | from `moon.mod.json`                | Package version                                |
 | `moonTarget`         | `preferred-target` in moon.mod.json | Build target (`native`, `js`, `wasm`, etc.)    |
 | `moonFlags`          | `[]`                                | Extra flags passed to `moon build`             |
