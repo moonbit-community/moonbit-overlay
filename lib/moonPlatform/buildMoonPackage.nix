@@ -96,6 +96,11 @@ let
           ' _ {} +
       '';
 
+      checkPhase = ''
+        cd $TMP
+        moon test --target ${effectiveTarget}
+      '';
+
       env = (args.env or { }) // {
         MOON_HOME = "${moonHome}";
       };
@@ -111,10 +116,12 @@ let
       // {
         name = args.name or derivedName;
         version = args.version or derivedVersion;
+        doCheck = args.doCheck or true;
         inherit nativeBuildInputs env;
         meta = derivedMeta // (args.meta or { });
         unpackPhase = args.unpackPhase or unpackPhase;
         buildPhase = args.buildPhase or buildPhase;
+        checkPhase = args.checkPhase or checkPhase;
         installPhase = args.installPhase or installPhase;
       }
     );
