@@ -76,49 +76,64 @@ nix flake init -t github:moonbit-community/moonbit-overlay
 
 ## Moonbit Package Builder
 
+`buildMoonPackage` builds a MoonBit project from source inside the Nix sandbox.
+It reads `moon.mod.json` to auto-detect version, preferred target, and source
+directory — minimal configuration is needed:
+
 ```nix
-
 {
-  description = "A startup basic MoonBit project";
-
   inputs = {
-    flake-parts.url = "github:hercules-ci/flake-parts";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     moonbit-overlay.url = "github:moonbit-community/moonbit-overlay";
     moon-registry = {
-      url = "mooncakes.io/git/index";
+      url = "git+https://mooncakes.io/git/index";
       flake = false;
     };
   };
 
-  outputs = inputs@{ flake-parts, ... }:
-    flake-parts.lib.mkFlake { inherit inputs; } {
-
-      perSystem = { inputs', system, pkgs, ... }: {
-        _module.args.pkgs = import inputs.nixpkgs {
-          inherit system;
-          overlays = [ inputs.moonbit-overlay.overlays.default ];
-        };
-
-        packages.default = pkgs.moonPlatform.buildMoonPackage {
-          name = "my-brilliant-moonbit-project";
-          src = ./.;
-          version = "0.1.0";
-          moonModJson = ./moon.mod.json;
-          moonRegistryIndex = inputs.moon-registry;
-          moonFlags = [ "--release" ];
-        }
+  outputs = { nixpkgs, moonbit-overlay, moon-registry, ... }:
+    let
+      system = "aarch64-darwin"; # or x86_64-linux, x86_64-darwin
+      pkgs = import nixpkgs {
+        inherit system;
+        overlays = [ moonbit-overlay.overlays.default ];
       };
-
-      systems = [
-        "x86_64-linux"
-        "aarch64-darwin"
-        "x86_64-darwin"
-      ];
+    in {
+      packages.${system}.default = pkgs.moonPlatform.buildMoonPackage {
+        name = "my-app";
+        src = ./.;
+        moonModJson = ./moon.mod.json;
+        moonRegistryIndex = moon-registry;
+      };
     };
 }
 ```
+
+### What it does automatically
+
+- Resolves and caches all transitive dependencies from `mooncakes.io` registry
+- Reads `version`, `preferred-target`, and `source` from `moon.mod.json`
+- Builds with `moon build --target <preferred-target> --release`
+- Installs all produced binaries to `$out/bin/`
+
+### Optional parameters
+
+| Parameter            | Default                             | Description                                    |
+| -------------------- | ----------------------------------- | ---------------------------------------------- |
+| `version`            | from `moon.mod.json`                | Package version                                |
+| `moonTarget`         | `preferred-target` in moon.mod.json | Build target (`native`, `js`, `wasm`, etc.)    |
+| `moonFlags`          | `[]`                                | Extra flags passed to `moon build`             |
+| `buildPhase`         | auto-generated                      | Override the build phase                       |
+| `installPhase`       | auto-generated                      | Override the install phase                     |
+| `nativeBuildInputs`  | `[]`                                | Merged with moonbit toolchain                  |
+
+### Public API
+
+`moonPlatform` exposes three functions:
+
+- `buildMoonPackage` — high-level builder (shown above)
+- `buildCachedRegistry` — fetch and cache mooncakes.io dependencies
+- `bundleWithRegistry` — create a complete `MOON_HOME` with toolchain + core + registry
 
 ## Bundled MoonBit Toolchains
 
