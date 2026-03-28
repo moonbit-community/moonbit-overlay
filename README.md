@@ -82,8 +82,12 @@ directory — minimal configuration is needed:
 
 ```nix
 {
+  description = "A startup basic MoonBit project";
+
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    flake-parts.url = "github:hercules-ci/flake-parts";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+
     moonbit-overlay.url = "github:moonbit-community/moonbit-overlay";
     moon-registry = {
       url = "git+https://mooncakes.io/git/index";
@@ -91,20 +95,28 @@ directory — minimal configuration is needed:
     };
   };
 
-  outputs = { nixpkgs, moonbit-overlay, moon-registry, ... }:
-    let
-      system = "aarch64-darwin"; # or x86_64-linux, x86_64-darwin
-      pkgs = import nixpkgs {
-        inherit system;
-        overlays = [ moonbit-overlay.overlays.default ];
+  outputs = inputs@{ flake-parts, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; } {
+
+      perSystem = { inputs', system, pkgs, ... }: {
+        _module.args.pkgs = import inputs.nixpkgs {
+          inherit system;
+          overlays = [ inputs.moonbit-overlay.overlays.default ];
+        };
+
+        packages.default = pkgs.moonPlatform.buildMoonPackage {
+          name = "my-brilliant-moonbit-project";
+          src = ./.;
+          moonModJson = ./moon.mod.json;
+          moonRegistryIndex = inputs.moon-registry;
+        };
       };
-    in {
-      packages.${system}.default = pkgs.moonPlatform.buildMoonPackage {
-        name = "my-app";
-        src = ./.;
-        moonModJson = ./moon.mod.json;
-        moonRegistryIndex = moon-registry;
-      };
+
+      systems = [
+        "x86_64-linux"
+        "aarch64-darwin"
+        "x86_64-darwin"
+      ];
     };
 }
 ```
