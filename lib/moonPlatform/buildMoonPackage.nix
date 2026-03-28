@@ -43,13 +43,10 @@ let
     stdenv.mkDerivation (
       args
       // {
-        inherit
-          nativeBuildInputs
-          unpackPhase
-          buildPhase
-          installPhase
-          env
-          ;
+        inherit nativeBuildInputs env;
+        unpackPhase = args.unpackPhase or unpackPhase;
+        buildPhase = args.buildPhase or buildPhase;
+        installPhase = args.installPhase or installPhase;
       }
     );
 in
