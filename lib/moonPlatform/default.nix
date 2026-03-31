@@ -83,6 +83,7 @@ in
 {
   inherit
     buildCachedRegistry
+    bundleWithRegistry
     buildMoonPackage
     ;
 }

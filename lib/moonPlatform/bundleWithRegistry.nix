@@ -24,7 +24,9 @@ symlinkJoin {
   postBuild = ''
     export MOON_HOME=$out
 
-    PATH=$out/bin $out/bin/${toolchains.meta.mainProgram} bundle --all --source-dir $out/lib/core
+    pushd $out/lib/core
+    PATH=$out/bin $out/bin/${toolchains.meta.mainProgram} bundle --all
+    popd
 
     wrapProgram $out/bin/${toolchains.meta.mainProgram} \
       --set MOON_HOME $out
