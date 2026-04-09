@@ -39,13 +39,8 @@ let
       }
     else
       rec {
-        moon-patched.${escapedRef} = callPackage ./moon-patched {
-          rev = record.moonRev;
-          hash = record.moonHash;
-        };
         toolchains.${escapedRef} = callPackage ./toolchains.nix {
           inherit version;
-          moon-patched = moon-patched.${escapedRef};
           url = mkToolChainsUri version;
           hash = record."${target}-toolchainsHash";
         };

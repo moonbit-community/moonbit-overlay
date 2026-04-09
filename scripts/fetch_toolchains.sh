@@ -21,18 +21,6 @@ fetch-sha256() {
   echo "$hash"
 }
 
-fetch-github-sha256() {
-  owner="$1"
-  repo="$2"
-  rev="$3"
-  echo -e "\e[0;36mfetching \e[4;36mhttps://github.com/$owner/$repo/archive/$rev.tar.gz\e[0;36m...\e[0m" > /dev/stderr
-  hash=$(nix-prefetch-url --unpack "https://github.com/$owner/$repo/archive/$rev.tar.gz")
-  hash=$(nix-hash --to-base64 --type sha256 "$hash")
-  echo -e "\e[0;36mcalculated hash: \e[1;36m$hash\e[0m" > /dev/stderr
-
-  echo "$hash"
-}
-
 run_version=""
 old_version=$($sednr 's|^\s*"version\": \"(.*)\",$|\1|p' $latest_file)
 for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
@@ -59,7 +47,7 @@ for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
     # assume that all `moonc` and `moon` in different arches have the same version
     if [ -z "${run_version}" ] || [ -z "${moon_version}" ]; then
       run_version=$(nix run .\#moonc -- -v)
-      moon_version=$(nix run .\#moon version)
+      moon_version=$(nix run .\#moon version | head -n1)
 
       # remove the date suffix after the whitespace
       if [[ "$run_version" == *" "* ]]; then
@@ -93,14 +81,6 @@ for target in linux-x86_64 darwin-aarch64; do # Keep the linux-x86_64 first
     echo -e "\e[0;36mfetching core\e[0m" > /dev/stderr
     target_hash=$(fetch-sha256 "$uri/cores/core-latest.tar.gz" "moonbit-core.tar.gz")
     $sedi "s|coreHash\": \"sha256-.*\"|coreHash\": \"sha256-$target_hash\"|" $latest_file
-
-    # update moon version
-    $sedi "s|moonRev\": \".*\"|moonRev\": \"$short_rev\"|" $latest_file
-
-    moon_hash=$(fetch-github-sha256 "moonbitlang" "moon" "$short_rev")
-    $sedi "s|moonHash\": \"sha256-.*\"|moonHash\": \"sha256-$moon_hash\"|" $latest_file
-
-    echo "moon_revision=$short_rev" >> "$GITHUB_OUTPUT"
 
     # pin
     cp $latest_file "$toolchains_dir/$run_version.json"

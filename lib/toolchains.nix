@@ -7,7 +7,6 @@
   libgcc,
   tinycc,
   # manually
-  moon-patched,
   version,
   url,
   hash,
@@ -44,9 +43,6 @@ stdenv.mkDerivation {
 
     ''
     + lib.optionalString (version != "latest") ''
-      cp ${moon-patched}/bin/moon $out/bin/moon
-      cp ${moon-patched}/bin/moonrun $out/bin/moonrun
-
       rm $out/bin/internal/tcc
       ln -sf ${tinycc.out}/bin/tcc $out/bin/internal/tcc
     ''
