@@ -23,16 +23,16 @@ symlinkJoin {
     export MOON_HOME=$out
     export PATH=$out/bin:$PATH
 
-    $out/bin/moon bundle \
-      -v --warn-list -a --all -C $out/lib/core ||
+    $out/bin/moon -C $out/lib/core bundle \
+      -v --warn-list -a --all ||
       error "Failed to bundle core"
 
-    $out/bin/moon bundle \
-      -v --warn-list -a --target llvm -C $out/lib/core ||
+    $out/bin/moon -C $out/lib/core bundle \
+      -v --warn-list -a --target llvm ||
       error "Failed to bundle core to llvm"
 
-    $out/bin/moon bundle \
-      -v --warn-list -a --target wasm-gc -C $out/lib/core ||
+    $out/bin/moon -C $out/lib/core bundle \
+      -v --warn-list -a --target wasm-gc ||
       error "Failed to bundle core to wasm-gc"
 
     wrapProgram $out/bin/${toolchains.meta.mainProgram} \
