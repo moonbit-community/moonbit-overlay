@@ -21,8 +21,19 @@ symlinkJoin {
 
   postBuild = ''
     export MOON_HOME=$out
+    export PATH=$out/bin:$PATH
 
-    PATH=$out/bin $out/bin/${toolchains.meta.mainProgram} bundle --all --source-dir $out/lib/core
+    $out/bin/moon bundle \
+      -v --warn-list -a --all -C $out/lib/core ||
+      error "Failed to bundle core"
+
+    $out/bin/moon bundle \
+      -v --warn-list -a --target llvm -C $out/lib/core ||
+      error "Failed to bundle core to llvm"
+
+    $out/bin/moon bundle \
+      -v --warn-list -a --target wasm-gc -C $out/lib/core ||
+      error "Failed to bundle core to wasm-gc"
 
     wrapProgram $out/bin/${toolchains.meta.mainProgram} \
       --set MOON_HOME $out
