@@ -33,13 +33,6 @@
             packages = with pkgs; [
               moonbit-bin.moonbit.latest
             ];
-
-            env = [
-              {
-                name = "MOON_HOME";
-                value = "${pkgs.moonbit-bin.moonbit.latest}";
-              }
-            ];
           };
         };
 
