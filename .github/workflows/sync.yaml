@@ -74,7 +74,8 @@ jobs:
 
     - name: Check if tag exists
       id: check_tag
-      if: steps.commit_version.outcome == 'success'
+      # only when `latest` actually changed (nightly-only updates leave this empty)
+      if: steps.commit_version.outcome == 'success' && steps.fetch_toolchains.outputs.version != ''
       run: |
         TAG="${{ steps.fetch_toolchains.outputs.version }}"
         if git fetch --tags && git tag | grep -q "^$TAG$"; then
@@ -83,7 +84,7 @@ jobs:
           echo "exists=false" >> $GITHUB_OUTPUT
         fi
     - name: Release new version
-      if: steps.commit_version.outcome == 'success' && steps.check_tag.outputs.exists == 'false'
+      if: steps.commit_version.outcome == 'success' && steps.fetch_toolchains.outputs.version != '' && steps.check_tag.outputs.exists == 'false'
       uses: ncipollo/release-action@v1
       with:
         tag: ${{ steps.fetch_toolchains.outputs.version }}

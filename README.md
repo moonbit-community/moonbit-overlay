@@ -169,6 +169,15 @@ moonbit-bin.moonbit.latest
 moonbit-bin.moonbit.latest
 ```
 
+### nightly
+
+```nix
+moonbit-bin.moonbit.nightly
+```
+
+`nightly` is a **rolling** channel that tracks the upstream nightly build
+(the same one the official installer fetches with `install.sh nightly`).
+
 ### specific version
 
 ```nix

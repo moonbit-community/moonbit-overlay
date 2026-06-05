@@ -13,24 +13,34 @@ rec {
   latestVersion = (lib.importJSON ../versions/toolchains/latest.json).version;
   # TODO(jinser): Refactoring to less messy code
   # TODO(jinser): documentation somewhere
+  # `nightly` is a rolling channel: it always points at the upstream nightly
+  # build instead of a pinned GitHub release mirror, since upstream only serves
+  # a single moving nightly (no dated archive to mirror). The hash in
+  # versions/toolchains/nightly.json is refreshed daily by CI.
   mkCoreUri =
     version:
-    let
-      version' = if version == "latest" then latestVersion else version;
-    in
-    if version' == "updating" then
-      "${moonbitUri}/cores/core-latest.tar.gz"
+    if version == "nightly" then
+      "${moonbitUri}/cores/core-nightly.tar.gz"
     else
-      "https://github.com/moonbit-community/moonbit-overlay/releases/download/${mkVersion version'}/moonbit-core.tar.gz";
+      let
+        version' = if version == "latest" then latestVersion else version;
+      in
+      if version' == "updating" then
+        "${moonbitUri}/cores/core-latest.tar.gz"
+      else
+        "https://github.com/moonbit-community/moonbit-overlay/releases/download/${mkVersion version'}/moonbit-core.tar.gz";
   mkToolChainsUri =
     version:
-    let
-      version' = if version == "latest" then latestVersion else version;
-    in
-    if version' == "updating" then
-      "${moonbitUri}/binaries/latest/moonbit-${target}.tar.gz"
+    if version == "nightly" then
+      "${moonbitUri}/binaries/nightly/moonbit-${target}.tar.gz"
     else
-      "https://github.com/moonbit-community/moonbit-overlay/releases/download/${mkVersion version'}/moonbit-${target}.tar.gz";
+      let
+        version' = if version == "latest" then latestVersion else version;
+      in
+      if version' == "updating" then
+        "${moonbitUri}/binaries/latest/moonbit-${target}.tar.gz"
+      else
+        "https://github.com/moonbit-community/moonbit-overlay/releases/download/${mkVersion version'}/moonbit-${target}.tar.gz";
   escape =
     let
       escapeFrom = [

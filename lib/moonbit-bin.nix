@@ -27,6 +27,7 @@ let
         !(builtins.elem version [
           "latest"
           "updating"
+          "nightly"
         ])
         && lib.versionOlder (lib.removePrefix "v" version) minVersion
       )
