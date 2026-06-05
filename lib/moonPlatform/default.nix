@@ -87,6 +87,8 @@ let
   linkMoonbitProgram = import ./linkMoonbitProgram.nix { inherit lib stdenv; };
   buildMoonbitRuntime = import ./buildMoonbitRuntime.nix { inherit stdenv; };
   makeMoonbitExecutable = import ./makeMoonbitExecutable.nix { inherit lib stdenv; };
+  buildMoonbitCStub = import ./buildMoonbitCStub.nix { inherit stdenv; };
+  archiveMoonbitStubs = import ./archiveMoonbitStubs.nix { inherit lib stdenv; };
 in
 {
   inherit
@@ -97,5 +99,7 @@ in
     linkMoonbitProgram
     buildMoonbitRuntime
     makeMoonbitExecutable
+    buildMoonbitCStub
+    archiveMoonbitStubs
     ;
 }
