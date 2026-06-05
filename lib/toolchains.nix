@@ -32,24 +32,28 @@ stdenv.mkDerivation {
     libgcc
   ];
 
-  installPhase =
-    ''
-      runHook preInstall
+  installPhase = ''
+    runHook preInstall
 
-      mkdir -p $out
-      cp -a ./* $out/
-      chmod +x $out/bin/*
-      chmod +x $out/bin/internal/tcc
+    mkdir -p $out
+    cp -a ./* $out/
+    chmod +x $out/bin/*
+    chmod +x $out/bin/internal/tcc
 
-    ''
-    + lib.optionalString (version != "latest") ''
-      rm $out/bin/internal/tcc
-      ln -sf ${tinycc.out}/bin/tcc $out/bin/internal/tcc
-    ''
-    + ''
+  ''
+  # On Linux the bundled `internal/tcc` is an autopatched ELF that does not
+  # work standalone, so we swap in nixpkgs `tinycc`. On Darwin the bundled
+  # Mach-O `tcc` is what upstream ships and uses, and nixpkgs `tinycc` is
+  # currently marked broken on aarch64-darwin (see issue #40), so keep the
+  # bundled one there. The boundary is the platform, not the version.
+  + lib.optionalString stdenv.hostPlatform.isLinux ''
+    rm $out/bin/internal/tcc
+    ln -sf ${tinycc.out}/bin/tcc $out/bin/internal/tcc
+  ''
+  + ''
 
-      runHook postInstall
-    '';
+    runHook postInstall
+  '';
 
   meta = {
     homepage = "moonbitlang.com";
