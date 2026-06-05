@@ -84,6 +84,7 @@ let
   # external planner emits one call per package, wiring deps through derivation
   # outputs. Toolchain-agnostic — the caller passes `toolchain`.
   buildMoonbitPackage = import ./buildMoonbitPackage.nix { inherit lib stdenv; };
+  runMoonbitPrebuild = import ./runMoonbitPrebuild.nix { inherit lib stdenv; };
   linkMoonbitProgram = import ./linkMoonbitProgram.nix { inherit lib stdenv; };
   buildMoonbitRuntime = import ./buildMoonbitRuntime.nix { inherit stdenv; };
   makeMoonbitExecutable = import ./makeMoonbitExecutable.nix { inherit lib stdenv; };
@@ -96,6 +97,7 @@ in
     bundleWithRegistry
     buildMoonPackage
     buildMoonbitPackage
+    runMoonbitPrebuild
     linkMoonbitProgram
     buildMoonbitRuntime
     makeMoonbitExecutable

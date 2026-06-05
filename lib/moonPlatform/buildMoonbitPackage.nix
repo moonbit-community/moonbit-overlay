@@ -26,6 +26,9 @@
   pkg,
   src,
   files,
+  # pre-build–generated sources, each pulled from its codegen derivation:
+  # [ { drv = <runMoonbitPrebuild drv>; file = "parser.mbt"; } ]
+  generated ? [ ],
   isMain ? false,
   # [ { core = <drv>; name = "<stem>"; alias = "<import alias>"; } ]
   deps ? [ ],
@@ -37,7 +40,7 @@
 }:
 let
   bundle = "${toolchain}/lib/core/_build/${target}/release/bundle";
-  srcArgs = map (f: "${src}/${f}") files;
+  srcArgs = (map (f: "${src}/${f}") files) ++ (map (g: "${g.drv}/${g.file}") generated);
   depArgs = lib.concatMap (d: [ "-i" "${d.core}/${d.name}.mi:${d.alias}" ]) deps;
   stdArgs = lib.concatMap (s: [ "-i" "${bundle}/${s.sub}/${s.last}.mi:${s.alias}" ]) stdImports;
 in
