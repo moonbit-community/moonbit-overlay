@@ -83,15 +83,15 @@ let
   # Fine-grained, per-package builders (the crate2nix/cargo2nix analogue): an
   # external planner emits one call per package, wiring deps through derivation
   # outputs. Toolchain-agnostic — the caller passes `toolchain`.
-  buildMoonCore = import ./buildMoonCore.nix { inherit lib stdenv; };
-  linkMoonCore = import ./linkMoonCore.nix { inherit lib stdenv; };
+  buildMoonbitPackage = import ./buildMoonbitPackage.nix { inherit lib stdenv; };
+  linkMoonbitProgram = import ./linkMoonbitProgram.nix { inherit lib stdenv; };
 in
 {
   inherit
     buildCachedRegistry
     bundleWithRegistry
     buildMoonPackage
-    buildMoonCore
-    linkMoonCore
+    buildMoonbitPackage
+    linkMoonbitProgram
     ;
 }

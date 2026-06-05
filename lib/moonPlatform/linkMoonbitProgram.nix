@@ -1,9 +1,9 @@
 # Link a set of `.core`s (a package and its dependency closure, dependencies
 # first) into the final wasm-gc artifact, via `moonc link-core`. The companion to
-# [buildMoonCore]; the standard-library `abort.core` / `core.core` are pulled from
-# the toolchain bundle automatically.
+# [buildMoonbitPackage]; the standard-library `abort.core` / `core.core` are pulled
+# from the toolchain bundle automatically.
 #
-#   moonPlatform.linkMoonCore {
+#   moonPlatform.linkMoonbitProgram {
 #     pname = "a_b";
 #     main  = "a/b";                                   # `-main` entry FQN
 #     cores = [ { core = depDrv; name = "dep_stem"; }  # deps first …

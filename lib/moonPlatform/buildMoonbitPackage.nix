@@ -4,11 +4,11 @@
 # This is the per-package analogue of crate2nix's `buildRustCrate` / cargo2nix's
 # `rustBuilder` — except it shells out to the compiler (`moonc`), not to `moon`.
 # An external planner (e.g. `moon export-nix`) computes the package graph and
-# emits one `buildMoonCore { … }` call per node, wiring dependencies through Nix
-# derivation outputs. wasm-gc only for now (native drags nixpkgs C libraries and
-# is handled by a separate builder).
+# emits one `buildMoonbitPackage { … }` call per node, wiring dependencies through
+# Nix derivation outputs. wasm-gc only for now (native drags nixpkgs C libraries
+# and is handled by a separate builder).
 #
-#   moonPlatform.buildMoonCore {
+#   moonPlatform.buildMoonbitPackage {
 #     pname = "a_b";                    # derivation name + artifact stem
 #     pkg   = "a/b";                    # `-pkg` FQN
 #     src   = ./a/b;                    # the package source directory
