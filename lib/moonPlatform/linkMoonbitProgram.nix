@@ -29,6 +29,9 @@ let
   bundle = "${toolchain}/lib/core/_build/${target}/release/bundle";
   coreArgs = map (c: "${c.core}/${c.name}.core") cores;
   pkgSrcArgs = lib.concatMap (p: [ "-pkg-sources" "${p.pkg}:${p.src}" ]) pkgSources;
+  # wasm-gc links straight to the final `.wasm`; native `link-core` instead emits
+  # an intermediate `.c` that `makeMoonbitExecutable` then compiles + links.
+  ext = if target == "native" then "c" else "wasm";
 in
 stdenv.mkDerivation {
   name = pname;
@@ -40,7 +43,7 @@ stdenv.mkDerivation {
     mkdir -p $out
     moonc link-core ${bundle}/abort/abort.core ${bundle}/core.core \
       ${lib.escapeShellArgs coreArgs} \
-      -main ${main} -o $out/${pname}.wasm \
+      -main ${main} -o $out/${pname}.${ext} \
       ${lib.escapeShellArgs pkgSrcArgs} \
       -pkg-sources moonbitlang/core:${toolchain}/lib/core \
       -target ${target}
