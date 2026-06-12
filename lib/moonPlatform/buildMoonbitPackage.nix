@@ -35,6 +35,16 @@
   # standard-library sub-package imports provided by the bundle:
   # [ { sub = "immut/sorted_map"; last = "sorted_map"; alias = "sorted_map"; } ]
   stdImports ? [ ],
+  # virtual-package wiring: check this build against a virtual interface `.mi`
+  # (a buildMoonbitInterface output):
+  #   { drv = <interface drv>; name = "<stem>"; pkg = "<virtual FQN>"; src = <virtual source dir>; }
+  # Set for a virtual package's own default impl (with noMi = true — the
+  # interface owns the `.mi`) and for a foreign implementation (with
+  # implVirtual = true).
+  checkMi ? null,
+  implVirtual ? false,
+  # `-no-mi`: don't emit the `.mi` sibling next to the `.core`.
+  noMi ? false,
   target ? "wasm-gc",
   toolchain,
 }:
@@ -43,6 +53,19 @@ let
   srcArgs = (map (f: "${src}/${f}") files) ++ (map (g: "${g.drv}/${g.file}") generated);
   depArgs = lib.concatMap (d: [ "-i" "${d.core}/${d.name}.mi:${d.alias}" ]) deps;
   stdArgs = lib.concatMap (s: [ "-i" "${bundle}/${s.sub}/${s.last}.mi:${s.alias}" ]) stdImports;
+  virtualArgs =
+    lib.optionals (checkMi != null) (
+      [
+        "-check-mi"
+        "${checkMi.drv}/${checkMi.name}.mi"
+      ]
+      ++ lib.optional implVirtual "-impl-virtual"
+      ++ [
+        "-pkg-sources"
+        "${checkMi.pkg}:${checkMi.src}"
+      ]
+    )
+    ++ lib.optional noMi "-no-mi";
 in
 stdenv.mkDerivation {
   name = pname;
@@ -56,7 +79,7 @@ stdenv.mkDerivation {
       -o $out/${pname}.core -pkg ${pkg} ${lib.optionalString isMain "-is-main"} \
       -std-path ${bundle} -i ${bundle}/prelude/prelude.mi:prelude \
       ${lib.escapeShellArgs (depArgs ++ stdArgs)} \
-      -pkg-sources ${pkg}:${src} -target ${target}
+      -pkg-sources ${pkg}:${src} ${lib.escapeShellArgs virtualArgs} -target ${target}
     runHook postBuild
   '';
 }
