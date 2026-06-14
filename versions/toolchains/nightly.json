@@ -1,6 +1,6 @@
 {
   "version": "nightly",
-  "coreHash": "sha256-9Aet8D8yJ1kiMitoD2V2rQCSWrM67O9x3DGAzkS8zf8=",
-  "linux-x86_64-toolchainsHash": "sha256-5VtBKDh7X4EYLBPMXdLpApyliCwwsX7QaeFxlhJPczA=",
-  "darwin-aarch64-toolchainsHash": "sha256-6zXN8sEVUS6thqf80949HbU7wETNvF5KyDhcL3E5c24="
+  "coreHash": "sha256-euAtYPqVklMVq6TwD4kKzGmYqroYRH9MFmhEgK1xe9I=",
+  "linux-x86_64-toolchainsHash": "sha256-tu0bt4SwLj7Bf7Kc67/RuGkNG1atSnlJ55CbsAaNR08=",
+  "darwin-aarch64-toolchainsHash": "sha256-tW/Et0N5jxlkU+RHEh/FrhGLB5J6u8BvcZM35bDjedY="
 }
