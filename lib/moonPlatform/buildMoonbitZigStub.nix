@@ -7,7 +7,14 @@
 #
 #   moonPlatform.buildMoonbitZigStub { pname = "a_b_0"; stub = ./a/b/stub.zig; toolchain = …; }
 #   # → $out/a_b_0.o
+#
+# `modules` (default `[]`) are translate-c'd headers the stub `@import`s, as
+# `{ name; drv; }` pairs (drv = a `translateMoonbitCHeader` derivation, output at
+# `$out/translated.zig`). When non-empty the build switches to the explicit module
+# form — `--dep <name> -Mmain=<stub> -M<name>=<drv>/translated.zig` — because the
+# bare positional-file form can't carry import deps. Mirrors mymoon's bare render.
 {
+  lib,
   stdenv,
   zig,
 }:
@@ -15,7 +22,15 @@
   pname,
   stub,
   toolchain,
+  modules ? [ ],
 }:
+let
+  moduleArgs =
+    lib.concatMapStringsSep " " (m: "--dep ${m.name}") modules
+    + " -Mmain=${stub} "
+    + lib.concatMapStringsSep " " (m: "-M${m.name}=${m.drv}/translated.zig") modules;
+  stubArg = if modules == [ ] then "${stub}" else moduleArgs;
+in
 stdenv.mkDerivation {
   name = pname;
   dontUnpack = true;
@@ -26,7 +41,7 @@ stdenv.mkDerivation {
     mkdir -p $out
     export HOME=$TMPDIR
     ${zig}/bin/zig build-obj -femit-bin=$out/${pname}.o -O ReleaseFast -fPIC \
-      -I${toolchain}/include ${stub}
+      -I${toolchain}/include ${stubArg}
     runHook postBuild
   '';
 }
