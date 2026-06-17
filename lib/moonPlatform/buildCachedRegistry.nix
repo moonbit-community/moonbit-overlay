@@ -23,24 +23,23 @@ let
     name = "cached-moon-registry";
     src = registryIndexSrc;
     phases = [ "installPhase" ];
-    installPhase =
+    installPhase = ''
+      mkdir -p $out/registry/index
+      cp -r $src/* $out/registry/index/
+    ''
+    + (lib.strings.concatMapStringsSep "\n" (
+      dep:
+      let
+        cache = fetchMoonPackage {
+          name = dep.name;
+          version = dep.version;
+          sha256 = dep.checksum;
+        };
+      in
       ''
-        mkdir -p $out/registry/index
-        cp -r $src/* $out/registry/index/
+        install -Dm644 ${cache} $out/registry/cache/${dep.name}/${dep.version}.zip
       ''
-      + (lib.strings.concatMapStringsSep "\n" (
-        dep:
-        let
-          cache = fetchMoonPackage {
-            name = dep.name;
-            version = dep.version;
-            sha256 = dep.checksum;
-          };
-        in
-        ''
-          install -Dm644 ${cache} $out/registry/cache/${dep.name}/${dep.version}.zip
-        ''
-      ) dependencyList);
+    ) dependencyList);
   };
 in
 buildCachedRegistry
