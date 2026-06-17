@@ -1,0 +1,36 @@
+# Weekly `nix flake update` → opens a PR. The companion `sync.yaml` only bumps the
+# MoonBit version table (versions/), never the flake INPUTS (nixpkgs, treefmt-nix),
+# so without this the lock drifts (it had fallen ~2 months behind, pinning an old
+# zig). PR-based (not a direct push) so input bumps get reviewed before merge.
+name: Update flake.lock
+
+on:
+  schedule:
+    - cron: '0 3 * * 1' # Mondays 03:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  lockfile:
+    name: Update flake.lock
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: nixbuild/nix-quick-install-action@v30
+
+      - name: Update flake.lock
+        uses: DeterminateSystems/update-flake-lock@main
+        with:
+          pr-title: 'flake.lock: weekly update'
+          pr-labels: |
+            dependencies
+            automated
+          # NB: the PR is opened with the default GITHUB_TOKEN, so `check.yaml`
+          # (pull_request-triggered) will NOT auto-run on it. Re-push or close/reopen
+          # the PR to trigger the flake check, or wire a PAT here if that matters.
