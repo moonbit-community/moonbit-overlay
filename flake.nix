@@ -120,8 +120,8 @@
           "moondoc"
           "moonfmt"
           "mooninfo"
-          "moonrrun"
-          "moonbit-lsp"
+          "moonrun"
+          "moon-lsp"
         ] mkMoonbitApp)
       );
 
