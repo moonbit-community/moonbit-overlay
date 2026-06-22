@@ -1,0 +1,85 @@
+# Fine-grained MoonBit builder: compile ONE package into its `.core` (+ sibling
+# `.mi`) as a standalone derivation, by driving `moonc build-package` directly.
+#
+# This is the per-package analogue of crate2nix's `buildRustCrate` / cargo2nix's
+# `rustBuilder` — except it shells out to the compiler (`moonc`), not to `moon`.
+# An external planner (e.g. `moon export-nix`) computes the package graph and
+# emits one `buildMoonbitPackage { … }` call per node, wiring dependencies through
+# Nix derivation outputs. wasm-gc only for now (native drags nixpkgs C libraries
+# and is handled by a separate builder).
+#
+#   moonPlatform.buildMoonbitPackage {
+#     pname = "a_b";                    # derivation name + artifact stem
+#     pkg   = "a/b";                    # `-pkg` FQN
+#     src   = ./a/b;                    # the package source directory
+#     files = [ "x.mbt" "y.mbt" ];      # .mbt sources to compile (tests pre-filtered)
+#     deps  = [ { core = otherDrv; name = "dep_stem"; alias = "dep"; } ];
+#     toolchain = pkgs.moonbit-bin.moonbit.latest;   # bundled toolchain (moonc + core bundle)
+#   }
+#   # → $out/a_b.core, $out/a_b.mi
+{
+  lib,
+  stdenv,
+}:
+{
+  pname,
+  pkg,
+  src,
+  files,
+  # pre-build–generated sources, each pulled from its codegen derivation:
+  # [ { drv = <runMoonbitPrebuild drv>; file = "parser.mbt"; } ]
+  generated ? [ ],
+  isMain ? false,
+  # [ { core = <drv>; name = "<stem>"; alias = "<import alias>"; } ]
+  deps ? [ ],
+  # standard-library sub-package imports provided by the bundle:
+  # [ { sub = "immut/sorted_map"; last = "sorted_map"; alias = "sorted_map"; } ]
+  stdImports ? [ ],
+  # virtual-package wiring: check this build against a virtual interface `.mi`
+  # (a buildMoonbitInterface output):
+  #   { drv = <interface drv>; name = "<stem>"; pkg = "<virtual FQN>"; src = <virtual source dir>; }
+  # Set for a virtual package's own default impl (with noMi = true — the
+  # interface owns the `.mi`) and for a foreign implementation (with
+  # implVirtual = true).
+  checkMi ? null,
+  implVirtual ? false,
+  # `-no-mi`: don't emit the `.mi` sibling next to the `.core`.
+  noMi ? false,
+  target ? "wasm-gc",
+  toolchain,
+}:
+let
+  bundle = "${toolchain}/lib/core/_build/${target}/release/bundle";
+  srcArgs = (map (f: "${src}/${f}") files) ++ (map (g: "${g.drv}/${g.file}") generated);
+  depArgs = lib.concatMap (d: [ "-i" "${d.core}/${d.name}.mi:${d.alias}" ]) deps;
+  stdArgs = lib.concatMap (s: [ "-i" "${bundle}/${s.sub}/${s.last}.mi:${s.alias}" ]) stdImports;
+  virtualArgs =
+    lib.optionals (checkMi != null) (
+      [
+        "-check-mi"
+        "${checkMi.drv}/${checkMi.name}.mi"
+      ]
+      ++ lib.optional implVirtual "-impl-virtual"
+      ++ [
+        "-pkg-sources"
+        "${checkMi.pkg}:${checkMi.src}"
+      ]
+    )
+    ++ lib.optional noMi "-no-mi";
+in
+stdenv.mkDerivation {
+  name = pname;
+  dontUnpack = true;
+  nativeBuildInputs = [ toolchain ];
+  phases = [ "buildPhase" ];
+  buildPhase = ''
+    runHook preBuild
+    mkdir -p $out
+    moonc build-package ${lib.escapeShellArgs srcArgs} \
+      -o $out/${pname}.core -pkg ${pkg} ${lib.optionalString isMain "-is-main"} \
+      -std-path ${bundle} -i ${bundle}/prelude/prelude.mi:prelude \
+      ${lib.escapeShellArgs (depArgs ++ stdArgs)} \
+      -pkg-sources ${pkg}:${src} ${lib.escapeShellArgs virtualArgs} -target ${target}
+    runHook postBuild
+  '';
+}
