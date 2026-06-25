@@ -21,12 +21,20 @@
   lib,
   stdenv,
   zig,
+  pkg-config,
 }:
 {
   pname,
   stub,
   toolchain,
   modules ? [ ],
+  # `options("pkg-config")` native deps: the module names whose `--cflags` (header
+  # search paths) join this stub's zig compile, plus the nixpkgs libraries providing
+  # them. Both default empty ⇒ the compile is unchanged (backward-compatible).
+  pkgConfig ? [ ],
+  buildInputs ? [ ],
+  # Cross-compile: a zig target triple. When set, `zig build-obj -target` it.
+  crossTarget ? null,
 }:
 let
   moduleArgs =
@@ -34,10 +42,14 @@ let
     + " -Mmain=${stub} "
     + lib.concatMapStringsSep " " (m: "-M${m.name}=${m.drv}/translated.zig") modules;
   stubArg = if modules == [ ] then "${stub}" else moduleArgs;
+  pkgCfgCflags = lib.optionalString (pkgConfig != [ ]) "$(pkg-config --cflags ${lib.escapeShellArgs pkgConfig})";
+  targetArg = lib.optionalString (crossTarget != null) "-target ${crossTarget}";
 in
 stdenv.mkDerivation {
   name = pname;
   dontUnpack = true;
+  nativeBuildInputs = lib.optional (pkgConfig != [ ]) pkg-config;
+  inherit buildInputs;
   phases = [ "buildPhase" ];
   # Zig wants a writable cache dir (HOME/.cache) even for `build-obj`.
   buildPhase = ''
@@ -45,7 +57,7 @@ stdenv.mkDerivation {
     mkdir -p $out
     export HOME=$TMPDIR
     ${zig}/bin/zig build-obj -femit-bin=$out/${pname}.o -O ReleaseFast -fPIC -lc \
-      -I${toolchain}/include ${stubArg}
+      ${targetArg} -I${toolchain}/include ${pkgCfgCflags} ${stubArg}
     runHook postBuild
   '';
 }

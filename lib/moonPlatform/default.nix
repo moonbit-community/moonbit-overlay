@@ -16,6 +16,7 @@
   callPackage,
   zig,
   clang,
+  pkg-config,
   # manually
   versions,
 }:
@@ -89,10 +90,10 @@ let
   buildMoonbitInterface = import ./buildMoonbitInterface.nix { inherit lib stdenv; };
   runMoonbitPrebuild = import ./runMoonbitPrebuild.nix { inherit lib stdenv; };
   linkMoonbitProgram = import ./linkMoonbitProgram.nix { inherit lib stdenv; };
-  buildMoonbitRuntime = import ./buildMoonbitRuntime.nix { inherit stdenv; };
-  makeMoonbitExecutable = import ./makeMoonbitExecutable.nix { inherit lib stdenv; };
-  buildMoonbitCStub = import ./buildMoonbitCStub.nix { inherit stdenv; };
-  buildMoonbitZigStub = import ./buildMoonbitZigStub.nix { inherit lib stdenv zig; };
+  buildMoonbitRuntime = import ./buildMoonbitRuntime.nix { inherit stdenv zig; };
+  makeMoonbitExecutable = import ./makeMoonbitExecutable.nix { inherit lib stdenv pkg-config zig; };
+  buildMoonbitCStub = import ./buildMoonbitCStub.nix { inherit lib stdenv pkg-config zig; };
+  buildMoonbitZigStub = import ./buildMoonbitZigStub.nix { inherit lib stdenv zig pkg-config; };
   translateMoonbitCHeader = import ./translateMoonbitCHeader.nix { inherit lib stdenv zig; };
   buildMoonbitObjcStub = import ./buildMoonbitObjcStub.nix { inherit stdenv clang; };
   archiveMoonbitStubs = import ./archiveMoonbitStubs.nix { inherit lib stdenv; };
