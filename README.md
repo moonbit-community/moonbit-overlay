@@ -155,7 +155,9 @@ moonbit-bin.moonbit.latest
 
 ## MoonBit LSP (distributed with compiler)
 
-The moonbit-bin.moonbit.${version} package already includes moonbit-lsp.
+The `moonbit-bin.moonbit.${version}` package already includes the language
+server. Invoke it through `moon lsp`; current toolchains dispatch that command
+to the bundled `moon-lsp` executable.
 
 ```nix
 moonbit-bin.moonbit.latest

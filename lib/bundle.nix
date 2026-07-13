@@ -38,20 +38,29 @@ symlinkJoin {
     wrapProgram $out/bin/${toolchains.meta.mainProgram} \
       --set MOON_TOOLCHAIN_ROOT $out
 
-    # The lsp server needs MOON_TOOLCHAIN_ROOT pointing at $out. As of recent
-    # nightlies it is a native binary named `moon-lsp` (it used to be a node
-    # script named `moonbit-lsp`, patched by rewriting its shebang). Wrap
-    # whichever the toolchain ships, and keep a `moonbit-lsp` alias for
-    # consumers still invoking the old name.
+    # `moon lsp` and `moon ide` delegate to standalone helper binaries.  The
+    # current native helpers still resolve the bundled core through MOON_HOME,
+    # while `moon` itself uses MOON_TOOLCHAIN_ROOT.  Scope the legacy variable
+    # to the helpers so normal `moon` commands keep their writable user home.
+    if [ -e $out/bin/moon-ide ]; then
+      wrapProgram $out/bin/moon-ide \
+        --set MOON_TOOLCHAIN_ROOT $out \
+        --set MOON_HOME $out
+    fi
+
+    # Recent toolchains ship a native `moon-lsp`; older releases shipped a
+    # node script named `moonbit-lsp`.  Wrap whichever the toolchain provides.
     if [ -e $out/bin/moon-lsp ]; then
-      wrapProgram $out/bin/moon-lsp --set MOON_TOOLCHAIN_ROOT $out
-      ln -sf moon-lsp $out/bin/moonbit-lsp
+      wrapProgram $out/bin/moon-lsp \
+        --set MOON_TOOLCHAIN_ROOT $out \
+        --set MOON_HOME $out
     elif [ -e $out/bin/moonbit-lsp ]; then
       mv $out/bin/moonbit-lsp $out/bin/.moonbit-lsp-orig
       substitute $out/bin/.moonbit-lsp-orig $out/bin/moonbit-lsp \
         --replace-fail "#!/usr/bin/env node" "${''
           #!${nodejs}/bin/node
           process.env.MOON_TOOLCHAIN_ROOT = \"$out\";
+          process.env.MOON_HOME = \"$out\";
         ''}"
       chmod +x $out/bin/moonbit-lsp
     fi

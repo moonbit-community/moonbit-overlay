@@ -141,9 +141,33 @@
             inherit system;
             overlays = [ overlay ];
           };
+          moonbit = pkgs.moonbit-bin.moonbit.latest;
         in
         {
           formatting = treefmtEval.${system}.config.build.check self;
+          testToolchainHelpers = pkgs.runCommand "test-moonbit-toolchain-helpers" { } ''
+            test -x ${moonbit}/bin/moon-lsp
+            test -x ${moonbit}/bin/moon-ide
+
+            grep -Fq "export MOON_TOOLCHAIN_ROOT='${moonbit}'" ${moonbit}/bin/moon-lsp
+            grep -Fq "export MOON_HOME='${moonbit}'" ${moonbit}/bin/moon-lsp
+            grep -Fq "export MOON_TOOLCHAIN_ROOT='${moonbit}'" ${moonbit}/bin/moon-ide
+            grep -Fq "export MOON_HOME='${moonbit}'" ${moonbit}/bin/moon-ide
+
+            # Current toolchains use the `moon-lsp` name directly; do not add a
+            # compatibility link for the old `moonbit-lsp` name.
+            test ! -e ${moonbit}/bin/moonbit-lsp
+            test ! -L ${moonbit}/bin/moonbit-lsp
+
+            export PATH=${moonbit}/bin:$PATH
+            export HOME=$TMPDIR/home
+            mkdir -p "$HOME"
+            unset MOON_HOME MOON_TOOLCHAIN_ROOT
+            moon lsp --version >/dev/null
+            moon ide --help >/dev/null
+
+            touch $out
+          '';
           # Run `nix build "#checks.<system>.testBuildMoonPackage"`
           testBuildMoonPackage = pkgs.moonPlatform.buildMoonPackage {
             name = "moonbit-overlay-test-with-deps";
