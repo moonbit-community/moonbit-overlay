@@ -13,6 +13,10 @@ on:
       - scripts/fetch_toolchains.sh
       - lib/moon-patched/update.sh
 
+concurrency:
+  group: moonbit-overlay-master-writes
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
@@ -79,9 +83,9 @@ jobs:
       run: |
         TAG="${{ steps.fetch_toolchains.outputs.version }}"
         if git fetch --tags && git tag | grep -q "^$TAG$"; then
-          echo "exists=true" >> $GITHUB_OUTPUT
+          echo "exists=true" >> "$GITHUB_OUTPUT"
         else
-          echo "exists=false" >> $GITHUB_OUTPUT
+          echo "exists=false" >> "$GITHUB_OUTPUT"
         fi
     - name: Release new version
       if: steps.commit_version.outcome == 'success' && steps.fetch_toolchains.outputs.version != '' && steps.check_tag.outputs.exists == 'false'

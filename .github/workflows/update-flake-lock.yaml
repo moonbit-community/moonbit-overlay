@@ -1,7 +1,7 @@
-# Weekly `nix flake update` → opens a PR. The companion `sync.yaml` only bumps the
-# MoonBit version table (versions/), never the flake INPUTS (nixpkgs, treefmt-nix),
-# so without this the lock drifts (it had fallen ~2 months behind, pinning an old
-# zig). PR-based (not a direct push) so input bumps get reviewed before merge.
+# Weekly `nix flake update` followed by `nix flake check`. The companion
+# `sync.yaml` only bumps the MoonBit version table (versions/), never the flake
+# inputs (nixpkgs, treefmt-nix), so without this the lock drifts. A successful
+# check is committed directly to master; a failed check leaves master untouched.
 name: Update flake.lock
 
 on:
@@ -9,9 +9,12 @@ on:
     - cron: '0 3 * * 1' # Mondays 03:00 UTC
   workflow_dispatch:
 
+concurrency:
+  group: moonbit-overlay-master-writes
+  cancel-in-progress: false
+
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
   lockfile:
@@ -22,17 +25,31 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: master
 
       - name: Install Nix
         uses: nixbuild/nix-quick-install-action@v30
 
       - name: Update flake.lock
-        uses: DeterminateSystems/update-flake-lock@main
-        with:
-          pr-title: 'flake.lock: weekly update'
-          pr-labels: |
-            dependencies
-            automated
-          # NB: the PR is opened with the default GITHUB_TOKEN, so `check.yaml`
-          # (pull_request-triggered) will NOT auto-run on it. Re-push or close/reopen
-          # the PR to trigger the flake check, or wire a PAT here if that matters.
+        id: update
+        run: |
+          nix flake update
+          if git diff --quiet -- flake.lock; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check flake
+        if: steps.update.outputs.changed == 'true'
+        run: nix flake check --no-update-lock-file --print-build-logs
+
+      - name: Commit and push flake.lock
+        if: success() && steps.update.outputs.changed == 'true'
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add flake.lock
+          git commit -m "flake.lock: weekly update"
+          git push origin HEAD:master
