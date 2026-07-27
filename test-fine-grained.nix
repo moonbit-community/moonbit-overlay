@@ -6,8 +6,12 @@ let
   system = pkgs.stdenv.hostPlatform.system;
   toolchain =
     (builtins.getFlake "github:moonbit-community/moonbit-overlay").packages.${system}.moonbit_latest;
-  buildMoonbitPackage = import ./lib/moonPlatform/buildMoonbitPackage.nix { inherit (pkgs) lib stdenv; };
-  linkMoonbitProgram = import ./lib/moonPlatform/linkMoonbitProgram.nix { inherit (pkgs) lib stdenv; };
+  buildMoonbitPackage = import ./lib/moonPlatform/buildMoonbitPackage.nix {
+    inherit (pkgs) lib stdenv;
+  };
+  linkMoonbitProgram = import ./lib/moonPlatform/linkMoonbitProgram.nix {
+    inherit (pkgs) lib stdenv;
+  };
 
   src = pkgs.writeTextDir "main.mbt" ''
     fn main {
@@ -26,7 +30,17 @@ in
 linkMoonbitProgram {
   pname = "hello_main";
   main = "hello/main";
-  cores = [ { core = core; name = "hello_main"; } ];
-  pkgSources = [ { pkg = "hello/main"; src = src; } ];
+  cores = [
+    {
+      core = core;
+      name = "hello_main";
+    }
+  ];
+  pkgSources = [
+    {
+      pkg = "hello/main";
+      src = src;
+    }
+  ];
   inherit toolchain;
 }

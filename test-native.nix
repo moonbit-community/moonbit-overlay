@@ -28,8 +28,18 @@ let
   cdrv = lp {
     pname = "hello_main";
     main = "hello/main";
-    cores = [ { core = core; name = "hello_main"; } ];
-    pkgSources = [ { pkg = "hello/main"; src = src; } ];
+    cores = [
+      {
+        core = core;
+        name = "hello_main";
+      }
+    ];
+    pkgSources = [
+      {
+        pkg = "hello/main";
+        src = src;
+      }
+    ];
     target = "native";
     inherit toolchain;
   };

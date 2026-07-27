@@ -30,7 +30,10 @@
 }:
 let
   bundle = "${toolchain}/lib/core/_build/${target}/release/bundle";
-  depArgs = lib.concatMap (d: [ "-i" "${d.core}/${d.name}.mi:${d.alias}" ]) deps;
+  depArgs = lib.concatMap (d: [
+    "-i"
+    "${d.core}/${d.name}.mi:${d.alias}"
+  ]) deps;
 in
 stdenv.mkDerivation {
   name = pname;

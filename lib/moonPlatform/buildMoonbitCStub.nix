@@ -23,7 +23,9 @@
   toolchain,
 }:
 let
-  pkgCfgCflags = lib.optionalString (pkgConfig != [ ]) "$(pkg-config --cflags ${lib.escapeShellArgs pkgConfig})";
+  pkgCfgCflags = lib.optionalString (
+    pkgConfig != [ ]
+  ) "$(pkg-config --cflags ${lib.escapeShellArgs pkgConfig})";
   cc = if crossTarget == null then "$CC" else "${zig}/bin/zig cc -target ${crossTarget}";
 in
 stdenv.mkDerivation {

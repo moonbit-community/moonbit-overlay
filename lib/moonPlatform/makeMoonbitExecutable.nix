@@ -39,7 +39,9 @@
 }:
 let
   stubArgs = map (a: "${a.drv}/${a.name}") stubArchives;
-  pkgCfgLibs = lib.optionalString (pkgConfig != [ ]) "$(pkg-config --libs ${lib.escapeShellArgs pkgConfig})";
+  pkgCfgLibs = lib.optionalString (
+    pkgConfig != [ ]
+  ) "$(pkg-config --libs ${lib.escapeShellArgs pkgConfig})";
   cc = if crossTarget == null then "$CC" else "${zig}/bin/zig cc -target ${crossTarget}";
   # Host: link the prebuilt simdutf + libbacktrace (+ libm). Cross: none of these
   # build-arch objects exist for the target — link only libm (the target libc's).

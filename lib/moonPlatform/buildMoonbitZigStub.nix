@@ -42,7 +42,9 @@ let
     + " -Mmain=${stub} "
     + lib.concatMapStringsSep " " (m: "-M${m.name}=${m.drv}/translated.zig") modules;
   stubArg = if modules == [ ] then "${stub}" else moduleArgs;
-  pkgCfgCflags = lib.optionalString (pkgConfig != [ ]) "$(pkg-config --cflags ${lib.escapeShellArgs pkgConfig})";
+  pkgCfgCflags = lib.optionalString (
+    pkgConfig != [ ]
+  ) "$(pkg-config --cflags ${lib.escapeShellArgs pkgConfig})";
   targetArg = lib.optionalString (crossTarget != null) "-target ${crossTarget}";
 in
 stdenv.mkDerivation {

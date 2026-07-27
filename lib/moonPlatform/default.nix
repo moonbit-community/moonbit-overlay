@@ -91,9 +91,30 @@ let
   runMoonbitPrebuild = import ./runMoonbitPrebuild.nix { inherit lib stdenv; };
   linkMoonbitProgram = import ./linkMoonbitProgram.nix { inherit lib stdenv; };
   buildMoonbitRuntime = import ./buildMoonbitRuntime.nix { inherit stdenv zig; };
-  makeMoonbitExecutable = import ./makeMoonbitExecutable.nix { inherit lib stdenv pkg-config zig; };
-  buildMoonbitCStub = import ./buildMoonbitCStub.nix { inherit lib stdenv pkg-config zig; };
-  buildMoonbitZigStub = import ./buildMoonbitZigStub.nix { inherit lib stdenv zig pkg-config; };
+  makeMoonbitExecutable = import ./makeMoonbitExecutable.nix {
+    inherit
+      lib
+      stdenv
+      pkg-config
+      zig
+      ;
+  };
+  buildMoonbitCStub = import ./buildMoonbitCStub.nix {
+    inherit
+      lib
+      stdenv
+      pkg-config
+      zig
+      ;
+  };
+  buildMoonbitZigStub = import ./buildMoonbitZigStub.nix {
+    inherit
+      lib
+      stdenv
+      zig
+      pkg-config
+      ;
+  };
   translateMoonbitCHeader = import ./translateMoonbitCHeader.nix { inherit lib stdenv zig; };
   buildMoonbitObjcStub = import ./buildMoonbitObjcStub.nix { inherit stdenv clang; };
   archiveMoonbitStubs = import ./archiveMoonbitStubs.nix { inherit lib stdenv; };

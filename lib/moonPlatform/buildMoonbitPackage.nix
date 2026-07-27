@@ -51,8 +51,14 @@
 let
   bundle = "${toolchain}/lib/core/_build/${target}/release/bundle";
   srcArgs = (map (f: "${src}/${f}") files) ++ (map (g: "${g.drv}/${g.file}") generated);
-  depArgs = lib.concatMap (d: [ "-i" "${d.core}/${d.name}.mi:${d.alias}" ]) deps;
-  stdArgs = lib.concatMap (s: [ "-i" "${bundle}/${s.sub}/${s.last}.mi:${s.alias}" ]) stdImports;
+  depArgs = lib.concatMap (d: [
+    "-i"
+    "${d.core}/${d.name}.mi:${d.alias}"
+  ]) deps;
+  stdArgs = lib.concatMap (s: [
+    "-i"
+    "${bundle}/${s.sub}/${s.last}.mi:${s.alias}"
+  ]) stdImports;
   virtualArgs =
     lib.optionals (checkMi != null) (
       [
