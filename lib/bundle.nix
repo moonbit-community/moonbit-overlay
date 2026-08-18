@@ -38,6 +38,11 @@ symlinkJoin {
     wrapProgram $out/bin/${toolchains.meta.mainProgram} \
       --set MOON_TOOLCHAIN_ROOT $out
 
+    # `moonx` is another entrance to the `moon` executable: the binary selects
+    # the `moonx` CLI when its invoked name (argv[0]) is `moonx`, so the
+    # official installer ships `moonx` as a symlink to `moon`.
+    ln -sfn moon $out/bin/moonx
+
     # `moon lsp` and `moon ide` delegate to standalone helper binaries.  The
     # current native helpers still resolve the bundled core through MOON_HOME,
     # while `moon` itself uses MOON_TOOLCHAIN_ROOT.  Scope the legacy variable

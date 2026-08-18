@@ -163,6 +163,18 @@ to the bundled `moon-lsp` executable.
 moonbit-bin.moonbit.latest
 ```
 
+## Moonx (executable package runner)
+
+Like the official installer, the toolchain also ships `moonx` as a symlink to
+`moon`. The `moon` binary selects the `moonx` CLI when it is invoked under the
+name `moonx`, so `moonx` runs packages from the Mooncakes registry without
+installing them:
+
+```bash
+nix run github:moonbit-community/moonbit-overlay#moonx -- user/module/package
+nix run github:moonbit-community/moonbit-overlay#moonx -- kokic/fakefetch/cli/ffetch
+```
+
 ## Version
 
 ### latest

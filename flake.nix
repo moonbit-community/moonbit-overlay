@@ -114,6 +114,7 @@
         }
         // (lib.genAttrs [
           "moon"
+          "moonx"
           "moonc"
           "mooncake"
           "moon_cove_report"
@@ -148,6 +149,12 @@
           testToolchainHelpers = pkgs.runCommand "test-moonbit-toolchain-helpers" { } ''
             test -x ${moonbit}/bin/moon-lsp
             test -x ${moonbit}/bin/moon-ide
+
+            # `moonx` is a symlink to `moon` (argv[0] dispatch, like the
+            # official installer) and must expose the moonx CLI.
+            test -L ${moonbit}/bin/moonx
+            test -x ${moonbit}/bin/moonx
+            ${moonbit}/bin/moonx --help | grep -Fq "Run a package from the Mooncakes registry"
 
             grep -Fq "export MOON_TOOLCHAIN_ROOT='${moonbit}'" ${moonbit}/bin/moon-lsp
             grep -Fq "export MOON_HOME='${moonbit}'" ${moonbit}/bin/moon-lsp
