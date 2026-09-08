@@ -122,7 +122,6 @@
           "moonfmt"
           "mooninfo"
           "moonrun"
-          "moon-lsp"
         ] mkMoonbitApp)
       );
 
@@ -189,18 +188,18 @@
             grep -Fq "export MOON_TOOLCHAIN_ROOT='${moonbit}'" ${moonbit}/bin/moon-ide
             grep -Fq "export MOON_HOME='${moonbit}'" ${moonbit}/bin/moon-ide
 
-            # Current toolchains use the `moon-lsp` name directly; do not add a
+            # `moon lsp` dispatches to the bundled helper; do not add a
             # compatibility link for the old `moonbit-lsp` name.
             test ! -e ${moonbit}/bin/moonbit-lsp
             test ! -L ${moonbit}/bin/moonbit-lsp
 
-            export PATH=${moonbit}/bin:$PATH
             export HOME=$TMPDIR/home
             mkdir -p "$HOME"
             unset MOON_HOME MOON_TOOLCHAIN_ROOT
-            moon lsp --version >/dev/null
-            moon-lsp --version >/dev/null
-            moon ide --help >/dev/null
+            # Do not add the toolchain to PATH: the moon wrapper must find
+            # its own helpers, just as it must when launched through nix run.
+            ${moonbit}/bin/moon lsp --version >/dev/null
+            ${moonbit}/bin/moon ide --help >/dev/null
 
             touch $out
           '';
