@@ -198,6 +198,7 @@
             export HOME=$TMPDIR/home
             mkdir -p "$HOME"
             unset MOON_HOME MOON_TOOLCHAIN_ROOT
+            moon lsp --version >/dev/null
             moon-lsp --version >/dev/null
             moon ide --help >/dev/null
 

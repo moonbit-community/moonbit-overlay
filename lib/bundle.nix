@@ -43,8 +43,8 @@ symlinkJoin {
     # official installer ships `moonx` as a symlink to `moon`.
     ln -sfn moon $out/bin/moonx
 
-    # Invoke `moon-lsp` directly; `moon ide` delegates to `moon-ide`.  These
-    # native helpers still resolve the bundled core through MOON_HOME,
+    # `moon lsp` and `moon ide` delegate to standalone helper binaries.  The
+    # current native helpers still resolve the bundled core through MOON_HOME,
     # while `moon` itself uses MOON_TOOLCHAIN_ROOT.  Scope the legacy variable
     # to the helpers so normal `moon` commands keep their writable user home.
     if [ -e $out/bin/moon-ide ]; then

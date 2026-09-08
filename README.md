@@ -163,12 +163,10 @@ moonbit-bin.moonbit.latest
 ## MoonBit LSP (distributed with compiler)
 
 The `moonbit-bin.moonbit.${version}` package already includes the language
-server. Invoke the bundled `moon-lsp` executable directly; current toolchains
-have removed the former `moon lsp` subcommand. Configure your editor's language
-server command as `moon-lsp` with no `lsp` argument, and ensure the package's
-`bin` directory is on `PATH`.
-
-The flake also exposes the standalone language server directly:
+server. Configure your editor to run `moon lsp` (command `moon`, argument `lsp`),
+with the package's `bin` directory on `PATH`. Moon dispatches this command to
+the bundled `moon-lsp` executable. Direct invocation of `moon-lsp` is also
+supported through the flake app:
 
 ```bash
 nix run github:moonbit-community/moonbit-overlay#moon-lsp -- --version
