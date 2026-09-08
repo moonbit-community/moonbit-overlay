@@ -145,6 +145,33 @@
           moonbit = pkgs.moonbit-bin.moonbit.latest;
         in
         {
+          testPackageOutput = pkgs.runCommand "test-package-output" { } ''
+            expected=$(printf 'aGk=\n89')
+            test "$(${self.checks.${system}.testBuildMoonPackage}/bin/main)" = "$expected"
+            touch $out
+          '';
+          testNative =
+            let
+              executable = import ./test-native.nix {
+                inherit pkgs;
+                toolchain = moonbit;
+              };
+            in
+            pkgs.runCommand "test-native-output" { } ''
+              test "$(${executable}/hello_main)" = "hi from native makeMoonbitExecutable"
+              touch $out
+            '';
+          testFineGrained =
+            let
+              wasm = import ./test-fine-grained.nix {
+                inherit pkgs;
+                toolchain = moonbit;
+              };
+            in
+            pkgs.runCommand "test-wasm-output" { } ''
+              test "$(${moonbit}/bin/moonrun ${wasm}/hello_main.wasm)" = "hi from buildMoonbitPackage framework"
+              touch $out
+            '';
           formatting = treefmtEval.${system}.config.build.check self;
           testToolchainHelpers = pkgs.runCommand "test-moonbit-toolchain-helpers" { } ''
             test -x ${moonbit}/bin/moon-lsp
@@ -154,7 +181,8 @@
             # official installer) and must expose the moonx CLI.
             test -L ${moonbit}/bin/moonx
             test -x ${moonbit}/bin/moonx
-            ${moonbit}/bin/moonx --help | grep -Fq "Run a package from the Mooncakes registry"
+            ${moonbit}/bin/moonx --help > moonx-help.txt
+            grep -Fq "Usage: moonx " moonx-help.txt
 
             grep -Fq "export MOON_TOOLCHAIN_ROOT='${moonbit}'" ${moonbit}/bin/moon-lsp
             grep -Fq "export MOON_HOME='${moonbit}'" ${moonbit}/bin/moon-lsp
@@ -170,7 +198,7 @@
             export HOME=$TMPDIR/home
             mkdir -p "$HOME"
             unset MOON_HOME MOON_TOOLCHAIN_ROOT
-            moon lsp --version >/dev/null
+            moon-lsp --version >/dev/null
             moon ide --help >/dev/null
 
             touch $out
@@ -179,11 +207,15 @@
           testBuildMoonPackage = pkgs.moonPlatform.buildMoonPackage {
             name = "moonbit-overlay-test-with-deps";
             src = ./test/with_deps;
-            moonModJson = ./test/with_deps/moon.mod.json;
+            moonMod = {
+              name = "moonbit-community/overlay_test";
+              version = "0.1.0";
+              deps."gmlewis/base64" = "0.16.12";
+            };
             moonRegistryIndex = pkgs.fetchgit {
               url = "https://mooncakes.io/git/index";
-              rev = "db98c15d651555a82a229a8ed29973ef04a3c683";
-              sha256 = "sha256-ZU514Qu8/aJJLRvnVOH+qc8SN1vAoFV338UQvIxh+Ro=";
+              rev = "f0aa1651050f9651faad3fa2496c20117acbc637";
+              sha256 = "sha256-BnBfIckkCKlSf6T7aEwFtxWs7ycN3OZRQAoAZpMg8tw=";
             };
           };
         }

@@ -1,17 +1,9 @@
 # Smoke test for the fine-grained builders: compile + link a trivial main package
-# straight through buildMoonCore / linkMoonCore, no `moon`/mymoon involved.
-#   nix build -f test-fine-grained.nix --impure --print-out-paths
+# straight through buildMoonbitPackage / linkMoonbitProgram, no `moon`/mymoon involved.
+#   nix build .#checks.x86_64-linux.testFineGrained
+{ pkgs, toolchain }:
 let
-  pkgs = import <nixpkgs> { };
-  system = pkgs.stdenv.hostPlatform.system;
-  toolchain =
-    (builtins.getFlake "github:moonbit-community/moonbit-overlay").packages.${system}.moonbit_latest;
-  buildMoonbitPackage = import ./lib/moonPlatform/buildMoonbitPackage.nix {
-    inherit (pkgs) lib stdenv;
-  };
-  linkMoonbitProgram = import ./lib/moonPlatform/linkMoonbitProgram.nix {
-    inherit (pkgs) lib stdenv;
-  };
+  platform = pkgs.moonPlatform;
 
   src = pkgs.writeTextDir "main.mbt" ''
     fn main {
@@ -19,7 +11,7 @@ let
     }
   '';
 
-  core = buildMoonbitPackage {
+  core = platform.buildMoonbitPackage {
     pname = "hello_main";
     pkg = "hello/main";
     inherit src toolchain;
@@ -27,7 +19,7 @@ let
     isMain = true;
   };
 in
-linkMoonbitProgram {
+platform.linkMoonbitProgram {
   pname = "hello_main";
   main = "hello/main";
   cores = [

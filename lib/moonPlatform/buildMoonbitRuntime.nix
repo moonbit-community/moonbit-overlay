@@ -1,4 +1,4 @@
-# Compile the MoonBit native runtime (`runtime.c`, shipped in the toolchain) into
+# Compile the MoonBit native runtime sources (`lib/runtime/*.c`) into
 # `runtime.o`, once per native executable. The C compiler comes from `stdenv`
 # (`$CC` — the nixpkgs cc-wrapper, which resolves crt/libc correctly), the sources
 # and headers from the `toolchain`.
@@ -29,9 +29,11 @@ stdenv.mkDerivation {
     runHook preBuild
     mkdir -p $out
     export HOME=$TMPDIR
-    ${cc} -o $out/runtime.o -I${toolchain}/include -g -c -fwrapv -fno-strict-aliasing \
-      -O2 ${defines} \
-      ${toolchain}/lib/runtime.c
+    for source in ${toolchain}/lib/runtime/*.c; do
+      ${cc} -o "$(basename "$source" .c).o" -I${toolchain}/include -g -c \
+        -fwrapv -fno-strict-aliasing -O2 ${defines} "$source"
+    done
+    ${cc} -r -o $out/runtime.o ./*.o
     runHook postBuild
   '';
 }

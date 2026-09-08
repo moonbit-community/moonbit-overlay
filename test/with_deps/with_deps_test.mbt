@@ -1,9 +1,9 @@
 ///|
 test "fib" {
-  let array = [1, 2, 3, 4, 5].map(fib(_))
+  debug_inspect([0, 1, 2, 3, 4, 5].map(fib), content="[1, 1, 2, 3, 5, 8]")
+}
 
-  // `inspect` is used to check the output of the function
-  // Just write `inspect(value)` and execute `moon test --update`
-  // to update the expected output, and verify them afterwards
-  inspect(array, content="[1, 2, 3, 5, 8]")
+///|
+test "external dependency" {
+  debug_inspect(encoded_message(), content="\"aGk=\"")
 }

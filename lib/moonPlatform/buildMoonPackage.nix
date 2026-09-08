@@ -1,11 +1,11 @@
 # Main builder of moonPlatform.
 #
-# Reads moon.mod.json to determine version, source directory, and preferred
+# Takes module metadata to determine version and preferred
 # build target so callers need minimal configuration:
 #
 #   pkgs.moonPlatform.buildMoonPackage {
 #     src = ./.;
-#     moonModJson = ./moon.mod.json;
+#     moonMod = { name = "owner/project"; version = "0.1.0"; deps = { }; };
 #     moonRegistryIndex = inputs.moon-registry;
 #   }
 {
@@ -18,7 +18,7 @@
 let
   buildMoonPackage =
     {
-      moonModJson,
+      moonMod,
       moonRegistryIndex,
       moonFlags ? [ ],
       moonMainPkg ? null,
@@ -26,13 +26,9 @@ let
       ...
     }@args:
     let
-      moonMod = builtins.fromJSON (builtins.readFile moonModJson);
-
-      # Auto-detect from moon.mod.json
-      # name is "owner/repo" in moon.mod.json; use the last component
+      # The module name is "owner/repo"; use the last component
       derivedName = lib.last (lib.splitString "/" (moonMod.name or "moon-package"));
       derivedVersion = moonMod.version or "0.0.0";
-      sourceDir = moonMod.source or "src";
       preferredTarget = moonMod.preferred-target or "native";
 
       effectiveTarget = if moonTarget != null then moonTarget else preferredTarget;
@@ -53,7 +49,7 @@ let
         // lib.optionalAttrs (derivedLicense != null) { license = derivedLicense; };
 
       cachedRegistry = buildCachedRegistry {
-        inherit moonModJson;
+        inherit moonMod;
         registryIndexSrc = moonRegistryIndex;
       };
       moonHome = bundleWithRegistry {
@@ -63,7 +59,8 @@ let
 
       unpackPhase = ''
         mkdir -p $TMP
-        cp -r $src/* $TMP
+        cp -r "$src"/. "$TMP"
+        chmod -R u+w "$TMP"
       '';
 
       buildPhase = ''
@@ -107,7 +104,7 @@ let
     in
     stdenv.mkDerivation (
       (builtins.removeAttrs args [
-        "moonModJson"
+        "moonMod"
         "moonRegistryIndex"
         "moonFlags"
         "moonMainPkg"
