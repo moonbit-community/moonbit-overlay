@@ -164,7 +164,15 @@ moonbit-bin.moonbit.latest
 
 The `moonbit-bin.moonbit.${version}` package already includes the language
 server. Invoke the bundled `moon-lsp` executable directly; current toolchains
-have removed the former `moon lsp` subcommand.
+have removed the former `moon lsp` subcommand. Configure your editor's language
+server command as `moon-lsp` with no `lsp` argument, and ensure the package's
+`bin` directory is on `PATH`.
+
+The flake also exposes the standalone language server directly:
+
+```bash
+nix run github:moonbit-community/moonbit-overlay#moon-lsp -- --version
+```
 
 ```nix
 moonbit-bin.moonbit.latest

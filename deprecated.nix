@@ -11,7 +11,8 @@ in
 builtins.mapAttrs mkWarning {
   lsp = ''
     'lsp' is deprecated and has been removed.
-    The moonbit-bin.moonbit.<version> package already includes moonbit-lsp.
+    The moonbit-bin.moonbit.<version> package includes the language server.
+    With current toolchains, invoke moon-lsp directly (not moon lsp).
     For more information, see: https://github.com/moonbit-community/moonbit-overlay/pull/14
   '';
 }
