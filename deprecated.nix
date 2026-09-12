@@ -10,8 +10,9 @@ let
 in
 builtins.mapAttrs mkWarning {
   lsp = ''
-    'lsp' is deprecated and has been removed.
-    The moonbit-bin.moonbit.<version> package already includes moonbit-lsp.
+    The standalone Nix 'lsp' package attribute is deprecated and has been removed.
+    The moonbit-bin.moonbit.<version> package includes the language server.
+    Invoke it with moon lsp.
     For more information, see: https://github.com/moonbit-community/moonbit-overlay/pull/14
   '';
 }

@@ -77,8 +77,11 @@ nix flake init -t github:moonbit-community/moonbit-overlay
 ## Moonbit Package Builder
 
 `buildMoonPackage` builds a MoonBit project from source inside the Nix sandbox.
-It reads `moon.mod.json` to auto-detect version, preferred target, and source
-directory — minimal configuration is needed:
+Projects use `moon.mod` and `moon.pkg`. Pass module metadata as the `moonMod`
+Nix attribute set so dependency downloads can be resolved during evaluation,
+before the sandboxed MoonBit build. Dependency versions must match `moon.mod`.
+The former `moonModJson` argument has been replaced by `moonMod` in both
+`buildMoonPackage` and `buildCachedRegistry`.
 
 ```nix
 {
@@ -106,7 +109,11 @@ directory — minimal configuration is needed:
 
         packages.default = pkgs.moonPlatform.buildMoonPackage {
           src = ./.;
-          moonModJson = ./moon.mod.json;
+          moonMod = {
+            name = "owner/project";
+            version = "0.1.0";
+            deps = { }; # Exact registry versions, matching moon.mod
+          };
           moonRegistryIndex = inputs.moon-registry;
         };
       };
@@ -123,7 +130,7 @@ directory — minimal configuration is needed:
 ### What it does automatically
 
 - Resolves and caches all transitive dependencies from `mooncakes.io` registry
-- Reads `version`, `preferred-target`, and `source` from `moon.mod.json`
+- Uses `version` and `preferred-target` from `moonMod`
 - Builds with `moon build --target <preferred-target> --release`
 - Installs all produced binaries to `$out/bin/`
 
@@ -131,9 +138,9 @@ directory — minimal configuration is needed:
 
 | Parameter            | Default                             | Description                                    |
 | -------------------- | ----------------------------------- | ---------------------------------------------- |
-| `name`               | from `moon.mod.json`                | Derivation name (last component of mod name)   |
-| `version`            | from `moon.mod.json`                | Package version                                |
-| `moonTarget`         | `preferred-target` in moon.mod.json | Build target (`native`, `js`, `wasm`, etc.)    |
+| `name`               | from `moonMod`                | Derivation name (last component of mod name)   |
+| `version`            | from `moonMod`                | Package version                                |
+| `moonTarget`         | `preferred-target` in moonMod | Build target (`native`, `js`, `wasm`, etc.)    |
 | `moonFlags`          | `[]`                                | Extra flags passed to `moon build`             |
 | `buildPhase`         | auto-generated                      | Override the build phase                       |
 | `installPhase`       | auto-generated                      | Override the install phase                     |
@@ -156,8 +163,13 @@ moonbit-bin.moonbit.latest
 ## MoonBit LSP (distributed with compiler)
 
 The `moonbit-bin.moonbit.${version}` package already includes the language
-server. Invoke it through `moon lsp`; current toolchains dispatch that command
-to the bundled `moon-lsp` executable.
+server. Configure your editor to run `moon lsp` (command `moon`, argument `lsp`),
+with the package's `bin` directory on `PATH`. Moon dispatches this command to
+the bundled `moon-lsp` executable. Use the public `moon lsp` entry point:
+
+```bash
+nix run github:moonbit-community/moonbit-overlay#moon -- lsp --version
+```
 
 ```nix
 moonbit-bin.moonbit.latest

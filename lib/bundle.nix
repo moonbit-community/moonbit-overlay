@@ -35,7 +35,9 @@ symlinkJoin {
       -v --warn-list -a --target wasm-gc ||
       error "Failed to bundle core to wasm-gc"
 
+    # Subcommand dispatch must find the bundled helpers even via `nix run`.
     wrapProgram $out/bin/${toolchains.meta.mainProgram} \
+      --prefix PATH : $out/bin \
       --set MOON_TOOLCHAIN_ROOT $out
 
     # `moonx` is another entrance to the `moon` executable: the binary selects
