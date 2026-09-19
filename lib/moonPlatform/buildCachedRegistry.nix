@@ -9,10 +9,9 @@
 }:
 {
   registryIndexSrc, # path to $MOON_HOME/registry/index/
-  moonModJson, # path to <workspace>/moon.mod.json
+  moonMod, # module metadata with exact dependency versions
 }:
 let
-  moonMod = builtins.fromJSON (builtins.readFile moonModJson);
   moonModDepsSet = moonMod.deps or { };
   moonModDepsList = lib.mapAttrsToList (name: version: { inherit name version; }) moonModDepsSet;
   dependencyList = listAllDependencies {

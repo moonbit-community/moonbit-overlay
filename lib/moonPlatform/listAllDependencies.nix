@@ -1,4 +1,4 @@
-# List dependencies closure of dependencies in root moon.mod.json.
+# List dependencies closure of dependencies in module metadata.
 { lib, parseMoonIndex }:
 let
 

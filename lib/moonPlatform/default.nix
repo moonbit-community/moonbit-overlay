@@ -1,6 +1,6 @@
 # moonPlatform
 # Basic strategy:
-# 1. List up all dependencies of root moon.mod.json
+# 1. List up all dependencies of the supplied module metadata
 #    ./parseMoonIndex.nix
 #    ./listAllDependencies.nix
 # 2. Fetch all dependencies into $MOON_HOME/registry/cache
