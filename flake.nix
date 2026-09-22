@@ -66,8 +66,57 @@
         description = "A MoonBit development shell";
       };
       formatter = forEachSystem (system: treefmtEval.${system}.config.build.wrapper);
-      checks = forEachSystem (system: {
-        formatting = treefmtEval.${system}.config.build.check self;
-      });
+      checks = forEachSystem (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+          packages = self.packages.${system};
+          moonbit = packages.default;
+        in
+        {
+          formatting = treefmtEval.${system}.config.build.check self;
+        }
+        // lib.optionalAttrs (packages ? default) {
+          testToolchainHelpers =
+            pkgs.runCommand "test-moonbit-toolchain-helpers"
+              {
+                nativeBuildInputs = [ pkgs.python3 ];
+              }
+              ''
+                set -euxo pipefail
+
+                test -x ${moonbit}/bin/moon-lsp
+                test -x ${moonbit}/bin/moon-ide
+
+                # `moonx` is a symlink to `moon` (argv[0] dispatch, like the
+                # official installer) and must expose the moonx CLI.
+                test -L ${moonbit}/bin/moonx
+                test -x ${moonbit}/bin/moonx
+                ${moonbit}/bin/moonx --help > moonx-help.txt
+                grep -Fq "Usage: moonx " moonx-help.txt
+
+                grep -Fq "export MOON_TOOLCHAIN_ROOT='${moonbit}'" ${moonbit}/bin/moon-lsp
+                grep -Fq 'export MOON_HOME=''${MOON_HOME-' ${moonbit}/bin/moon-lsp
+                grep -Fq "export MOON_TOOLCHAIN_ROOT='${moonbit}'" ${moonbit}/bin/moon-ide
+                grep -Fq 'export MOON_HOME=''${MOON_HOME-' ${moonbit}/bin/moon-ide
+
+                # `moon lsp` dispatches to the bundled helper; do not add a
+                # compatibility link for the old `moonbit-lsp` name.
+                test ! -e ${moonbit}/bin/moonbit-lsp
+                test ! -L ${moonbit}/bin/moonbit-lsp
+
+                export HOME=$TMPDIR/home
+                mkdir -p "$HOME"
+                unset MOON_HOME MOON_TOOLCHAIN_ROOT
+                # Do not add the toolchain to PATH: the moon wrapper must find
+                # its own helpers, just as it must when launched through nix run.
+                ${moonbit}/bin/moon lsp --version >/dev/null
+                ${moonbit}/bin/moon ide --help >/dev/null
+                python ${./tests/lsp-smoke.py} ${moonbit}/bin/moon
+
+                touch $out
+              '';
+        }
+      );
     };
 }

@@ -1,5 +1,4 @@
 {
-  nodejs,
   symlinkJoin,
   makeWrapper,
   # manually
@@ -9,7 +8,8 @@
 }:
 
 symlinkJoin {
-  name = "moonbit";
+  name = "moonbit-${toolchains.version}";
+  inherit (toolchains) version meta;
   paths = [
     toolchains
     core
@@ -24,18 +24,26 @@ symlinkJoin {
     export PATH=$out/bin:$PATH
 
     $out/bin/moon -C $out/lib/core bundle \
-      -v --warn-list -a --all ||
-      error "Failed to bundle core"
+      -v --warn-list -a --all || {
+      echo "Failed to bundle core" >&2
+      exit 1
+    }
 
     $out/bin/moon -C $out/lib/core bundle \
-      -v --warn-list -a --target llvm ||
-      error "Failed to bundle core to llvm"
+      -v --warn-list -a --target llvm || {
+      echo "Failed to bundle core to llvm" >&2
+      exit 1
+    }
 
     $out/bin/moon -C $out/lib/core bundle \
-      -v --warn-list -a --target wasm-gc ||
-      error "Failed to bundle core to wasm-gc"
+      -v --warn-list -a --target wasm-gc || {
+      echo "Failed to bundle core to wasm-gc" >&2
+      exit 1
+    }
 
+    # Subcommand dispatch must find the bundled helpers even via `nix run`.
     wrapProgram $out/bin/${toolchains.meta.mainProgram} \
+      --prefix PATH : $out/bin \
       --set MOON_TOOLCHAIN_ROOT $out
 
     # `moonx` is another entrance to the `moon` executable: the binary selects
@@ -43,31 +51,22 @@ symlinkJoin {
     # official installer ships `moonx` as a symlink to `moon`.
     ln -sfn moon $out/bin/moonx
 
-    # `moon lsp` and `moon ide` delegate to standalone helper binaries.  The
-    # current native helpers still resolve the bundled core through MOON_HOME,
-    # while `moon` itself uses MOON_TOOLCHAIN_ROOT.  Scope the legacy variable
-    # to the helpers so normal `moon` commands keep their writable user home.
+    # `moon lsp` and `moon ide` delegate to standalone helper binaries.  Keep a
+    # caller-provided MOON_HOME, but default it to this immutable SDK for helpers
+    # from releases that still use MOON_HOME to locate the bundled core.
     if [ -e $out/bin/moon-ide ]; then
       wrapProgram $out/bin/moon-ide \
         --set MOON_TOOLCHAIN_ROOT $out \
-        --set MOON_HOME $out
+        --set-default MOON_HOME $out
     fi
 
-    # Recent toolchains ship a native `moon-lsp`; older releases shipped a
-    # node script named `moonbit-lsp`.  Wrap whichever the toolchain provides.
+    # `moon lsp` dispatches to this helper. MOON_HOME remains a user-overridable
+    # compatibility input used by the native helper to locate the bundled core.
     if [ -e $out/bin/moon-lsp ]; then
       wrapProgram $out/bin/moon-lsp \
         --set MOON_TOOLCHAIN_ROOT $out \
-        --set MOON_HOME $out
-    elif [ -e $out/bin/moonbit-lsp ]; then
-      mv $out/bin/moonbit-lsp $out/bin/.moonbit-lsp-orig
-      substitute $out/bin/.moonbit-lsp-orig $out/bin/moonbit-lsp \
-        --replace-fail "#!/usr/bin/env node" "${''
-          #!${nodejs}/bin/node
-          process.env.MOON_TOOLCHAIN_ROOT = \"$out\";
-          process.env.MOON_HOME = \"$out\";
-        ''}"
-      chmod +x $out/bin/moonbit-lsp
+        --set-default MOON_HOME $out
     fi
+    rm -f $out/bin/moonbit-lsp
   '';
 }
