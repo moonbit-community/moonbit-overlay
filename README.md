@@ -5,7 +5,8 @@ for Nix. Each package contains the matching compiler, CLI, language server,
 runtime tools, and bundled core library.
 
 This repository handles toolchain distribution. MoonBit project builds and
-Mooncakes dependency packaging belong to **moon-nix**.
+Mooncakes dependency packaging belong to
+[**moon2nix**](https://github.com/moonbit-community/moon2nix).
 
 ## Quick start
 
@@ -107,9 +108,9 @@ in the full toolchain; no separate LSP package is needed.
 | `overlays.moonbit-overlay` | `overlays.default` |
 | `templates.moonbit-dev` | `templates.default` |
 | Separate `toolchains`, `core`, `compiler`, or `lsp` packages | Complete toolchain package |
-| `moonPlatform`, `mkMoonPlatform`, and project/registry builders | Use moon-nix for project builds |
+| `moonPlatform`, `mkMoonPlatform`, and project/registry builders | Use moon2nix for project builds |
 
-The project builders and dependency fixtures have moved to moon-nix. The
+The project builders and dependency fixtures have moved to moon2nix. The
 obsolete patched moon implementation has been removed. The toolchain does not resolve project dependencies.
 
 ## Design
