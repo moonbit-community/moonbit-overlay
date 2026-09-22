@@ -86,7 +86,10 @@ the locked nixpkgs no longer supports it.
 
 `latest` resolves to a concrete release mirrored in this repository's GitHub
 releases. Pin the overlay revision (for example with `flake.lock`) to keep it
-fixed. `nightly` follows upstream's rolling nightly URL and recorded hash.
+fixed. `nightly` points to the newest nightly mirrored by this repository.
+Changed nightly builds are also exposed by date, for example
+`pkgs.moonbit-bin."nightly-2026-09-22"`, and stored as immutable prereleases so
+older lock files remain fetchable.
 
 ## Editor support
 

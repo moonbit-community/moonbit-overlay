@@ -16,6 +16,7 @@ let
         "nightly"
         "updating"
       ]
+      || lib.hasPrefix "nightly-" ref
       || lib.versionAtLeast (lib.removePrefix "v" record.version) minVersion
     )
   ) versions;

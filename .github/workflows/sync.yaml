@@ -93,3 +93,24 @@ jobs:
         immutableCreate: true
         body: "New version ${{ steps.fetch_toolchains.outputs.version }} fetched from MoonBit."
         artifacts: "moonbit-linux-x86_64.tar.gz, moonbit-darwin-aarch64.tar.gz, moonbit-core.tar.gz"
+
+    - name: Check if nightly tag exists
+      id: check_nightly_tag
+      if: steps.commit_version.outcome == 'success' && steps.fetch_toolchains.outputs.nightly_version != ''
+      run: |
+        TAG="${{ steps.fetch_toolchains.outputs.nightly_version }}"
+        if git fetch --tags && git tag | grep -q "^$TAG$"; then
+          echo "exists=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "exists=false" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Release nightly archive
+      if: steps.commit_version.outcome == 'success' && steps.fetch_toolchains.outputs.nightly_version != '' && steps.check_nightly_tag.outputs.exists == 'false'
+      uses: ncipollo/release-action@v1
+      with:
+        tag: ${{ steps.fetch_toolchains.outputs.nightly_version }}
+        immutableCreate: true
+        prerelease: true
+        body: "Archived MoonBit nightly ${{ steps.fetch_toolchains.outputs.nightly_version }}."
+        artifacts: "nightly-artifacts/moonbit-linux-x86_64.tar.gz, nightly-artifacts/moonbit-darwin-aarch64.tar.gz, nightly-artifacts/moonbit-core.tar.gz"
