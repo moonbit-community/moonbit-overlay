@@ -36,10 +36,6 @@
             // deprecated;
           moonbit-lang = final.callPackage ./lib/compiler.nix { };
 
-          mkMoonPlatform = final.callPackage ./lib/moonPlatform {
-            versions = import ./versions.nix lib;
-          };
-          moonPlatform = mkMoonPlatform { version = "latest"; };
           versions = import ./versions.nix lib;
         }
       );
@@ -175,17 +171,6 @@
 
             touch $out
           '';
-          # Run `nix build "#checks.<system>.testBuildMoonPackage"`
-          testBuildMoonPackage = pkgs.moonPlatform.buildMoonPackage {
-            name = "moonbit-overlay-test-with-deps";
-            src = ./test/with_deps;
-            moonModJson = ./test/with_deps/moon.mod.json;
-            moonRegistryIndex = pkgs.fetchgit {
-              url = "https://mooncakes.io/git/index";
-              rev = "db98c15d651555a82a229a8ed29973ef04a3c683";
-              sha256 = "sha256-ZU514Qu8/aJJLRvnVOH+qc8SN1vAoFV338UQvIxh+Ro=";
-            };
-          };
         }
       );
     };
