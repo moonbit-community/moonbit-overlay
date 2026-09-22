@@ -1,14 +1,4 @@
-# Overlay interface for non-flake Nix.
-final: prev:
-let
-  inherit (final) lib;
-in
-{
-  moonbit-bin =
-    (prev.moonbit-bin or { })
-    // import ./lib/moonbit-bin.nix {
-      inherit lib;
-      pkgs = final;
-      versions = import ./versions.nix lib;
-    };
+# Use the caller's package set for binary patching and runtime dependencies.
+final: prev: {
+  moonbit-bin = (prev.moonbit-bin or { }) // import ./lib/moonbit-bin.nix { pkgs = final; };
 }

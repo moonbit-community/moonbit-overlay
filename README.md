@@ -1,161 +1,120 @@
 # moonbit-overlay
 
-Binary distributed [MoonBit](https://www.moonbitlang.com/) toolchains.
+Versioned, binary-distributed [MoonBit](https://www.moonbitlang.com/) toolchains
+for Nix. Each package contains the matching compiler, CLI, language server,
+runtime tools, and bundled core library.
 
-NOTE: [moonbit-compiler](https://github.com/moonbitlang/moonbit-compiler) was already open sourced, BUT *only* wasm-gc backend is available. Considering this is an incomplete compiler and the version is quite lagging, this project will still only be able to use patched pre-built binaries for a long time.
+This repository handles toolchain distribution. MoonBit project builds and
+Mooncakes dependency packaging belong to **moon-nix**.
 
-## Quick Start
-
-### Run [moon](https://github.com/moonbitlang/moon) in one line
-
-```bash
-nix run github:moonbit-community/moonbit-overlay#moon
-```
-
-### List all available binaries
+## Quick start
 
 ```bash
-nix run github:moonbit-community/moonbit-overlay#<tab>
+nix run github:moonbit-community/moonbit-overlay#moon -- version
+nix run github:moonbit-community/moonbit-overlay#moon -- lsp --version
+nix shell github:moonbit-community/moonbit-overlay#latest
+nix shell github:moonbit-community/moonbit-overlay#nightly
 ```
 
-### Create devshell from template
+`nix run github:moonbit-community/moonbit-overlay` runs `moon` from `latest`.
+The `moonx` app runs executable packages from Mooncakes:
+
+```bash
+nix run github:moonbit-community/moonbit-overlay#moonx -- user/module/package
+```
+
+## Development shell
 
 ```bash
 nix flake init -t github:moonbit-community/moonbit-overlay
 ```
 
-## Features
+The template puts its flake in `nix/`; run `nix develop ./nix`.
 
-- build from source in future.
-- versioning!
-- patchelf works :)
-
-## Example
-
-### flake with overlay
+Alternatively, apply the overlay to your own nixpkgs:
 
 ```nix
 {
-  description = "A startup basic MoonBit project";
-
   inputs = {
-    flake-parts.url = "github:hercules-ci/flake-parts";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-
-    devshell.url = "github:numtide/devshell";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     moonbit-overlay.url = "github:moonbit-community/moonbit-overlay";
   };
 
-  outputs = inputs@{ flake-parts, ... }:
-    flake-parts.lib.mkFlake { inherit inputs; } {
-      imports = [
-        inputs.devshell.flakeModule
-      ];
-
-      perSystem = { inputs', system, pkgs, ... }: {
-        _module.args.pkgs = import inputs.nixpkgs {
-          inherit system;
-          overlays = [ inputs.moonbit-overlay.overlays.default ];
-        };
-
-        devshells.default = {
-            packages = with pkgs; [
-              moonbit-bin.moonbit.latest
-            ];
-          };
+  outputs = { nixpkgs, moonbit-overlay, ... }:
+    let
+      system = "x86_64-linux";
+      pkgs = import nixpkgs {
+        inherit system;
+        overlays = [ moonbit-overlay.overlays.default ];
       };
-
-      systems = [
-        "x86_64-linux"
-        "aarch64-darwin"
-        "x86_64-darwin"
-      ];
+    in {
+      devShells.${system}.default = pkgs.mkShell {
+        packages = [ pkgs.moonbit-bin.latest ];
+      };
     };
 }
 ```
 
-MoonBit project builds and Mooncakes dependency packaging are handled by
-**moon-nix**. This repository only distributes MoonBit toolchains.
+Without an overlay, use
+`moonbit-overlay.packages.${system}.latest` directly. The overlay uses the
+caller's nixpkgs for binary patching and runtime dependencies.
 
-## Bundled MoonBit Toolchains
+Non-flake users can apply `import ./default.nix` as an overlay to a pinned
+checkout of this repository.
 
-```nix
-moonbit-bin.moonbit.latest
-```
+## Versions and platforms
 
-## MoonBit LSP (distributed with compiler)
-
-The `moonbit-bin.moonbit.${version}` package already includes the language
-server. Invoke it through `moon lsp`; current toolchains dispatch that command
-to the bundled `moon-lsp` executable.
+Each public package is a complete toolchain:
 
 ```nix
-moonbit-bin.moonbit.latest
+pkgs.moonbit-bin.latest
+pkgs.moonbit-bin.nightly
+pkgs.moonbit-bin."v0.10.12+1634b282e+55ca257"
 ```
 
-## Moonx (executable package runner)
+Flake packages use the same names; `default` is an alias for `latest`.
+Version names are the original release identifiers, without escaping dots or
+plus signs. Available snapshots are recorded in [versions/toolchains](versions/toolchains).
+Versions older than `0.10.0` are retained as historical metadata but are not
+exposed. Version 0.10 is the first supported SDK generation with the current
+native helper layout, including `moon-lsp`.
 
-Like the official installer, the toolchain also ships `moonx` as a symlink to
-`moon`. The `moon` binary selects the `moonx` CLI when it is invoked under the
-name `moonx`, so `moonx` runs packages from the Mooncakes registry without
-installing them:
+Packages are exposed only when the snapshot has a hash for the requested host
+platform. The flake supports `x86_64-linux` and `aarch64-darwin`. Intel macOS is not
+exposed: the recorded snapshots have no binary hashes for that platform, and
+the locked nixpkgs no longer supports it.
 
-```bash
-nix run github:moonbit-community/moonbit-overlay#moonx -- user/module/package
-nix run github:moonbit-community/moonbit-overlay#moonx -- kokic/fakefetch/cli/ffetch
-```
+`latest` resolves to a concrete release mirrored in this repository's GitHub
+releases. Pin the overlay revision (for example with `flake.lock`) to keep it
+fixed. `nightly` follows upstream's rolling nightly URL and recorded hash.
 
-## Version
+## Editor support
 
-### latest
+Configure the language server as command `moon`, argument `lsp`. It is included
+in the full toolchain; no separate LSP package is needed.
 
-```nix
-moonbit-bin.moonbit.latest
-```
+## Migrating from the previous interface
 
-### nightly
+| Previous interface | Replacement |
+| --- | --- |
+| `pkgs.moonbit-bin.moonbit.latest` | `pkgs.moonbit-bin.latest` |
+| `packages.${system}.moonbit_latest` | `packages.${system}.latest` |
+| Escaped version attributes such as `v0_10_12-1634b282e-55ca257` | Quoted original version, `"v0.10.12+1634b282e+55ca257"` |
+| `legacyPackages.${system}.moonbit` | `packages.${system}` |
+| `overlays.moonbit-overlay` | `overlays.default` |
+| `templates.moonbit-dev` | `templates.default` |
+| Separate `toolchains`, `core`, `compiler`, or `lsp` packages | Complete toolchain package |
+| `moonPlatform`, `mkMoonPlatform`, and project/registry builders | Use moon-nix for project builds |
 
-```nix
-moonbit-bin.moonbit.nightly
-```
+The project builders and dependency fixtures have moved to moon-nix. The
+obsolete patched moon implementation has been removed. The toolchain does not resolve project dependencies.
 
-`nightly` is a **rolling** channel that tracks the upstream nightly build
-(the same one the official installer fetches with `install.sh nightly`).
+## Design
 
-### specific version
-
-```nix
-moonbit-bin.moonbit.v0_1_20241031-7204facb6
-```
-
-Check available versions in the [directory](versions/).
-
-> The original version of MoonBit is written as `v0.1.20241031+7204facb6`,
-> for convenience, we [escape](https://github.com/moonbit-community/moonbit-overlay/blob/3464a68cf9a16d4d63f76de823ca9687bca2de2d/lib/moonbit-bin.nix#L22-L24)
-> it to format like `v0_1_20241031-7204facb6`.
-
-## legacyPackages & packages
-
-The overlay now provides both `legacyPackages` and `packages` attributes:
-
-- **legacyPackages**: This is the original, structured attribute set. Packages are grouped by type (e.g., `moonbit`, `cli`, `core`) and version, making it easier to navigate the package hierarchy.
-- **packages**: This is a flattened attribute set, where each package is exposed as a single attribute (e.g., `moonbit_latest`, `cli_v0_1_20241031-7204facb6`). This structure is required for `nix flake check` to work correctly, as it expects all packages to be directly accessible under the `packages` attribute.
-
-Both are provided to maintain compatibility and usability: use `legacyPackages` for structured access, and `packages` for flake checks and direct access.
-
-Some deprecated packages are still exposed for compatibility; attempting to use them will show a warning and prevent building.
-
-## TODO
-
-- [ ] overridable
-- [ ] build from source (core)
-  see [pull#10](https://github.com/moonbit-community/moonbit-overlay/pull/10)
-- [ ] re-support legacy default.nix
-
-## Inspiration
-
-The moonbit-overlay is heavily inspired by [rust-overlay](https://github.com/oxalica/rust-overlay).
+Static release metadata is mapped to complete toolchain derivations. Internal
+steps fetch and patch the official binaries, install the matching core, bundle
+it, and wrap the tools for Nix.
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
+[MIT](LICENSE).

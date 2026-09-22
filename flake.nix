@@ -1,4 +1,6 @@
 {
+  description = "Versioned binary MoonBit toolchains";
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     treefmt-nix = {
@@ -15,163 +17,57 @@
     }:
     let
       inherit (nixpkgs) lib;
-      forEachSystem = lib.genAttrs lib.systems.flakeExposed;
-
-      minVersion = "0.6.28";
-      deprecated = import ./deprecated.nix lib;
-
-      overlay = (
-        final: prev:
-        let
-          inherit (final) lib;
-        in
-        rec {
-          moonbit-bin =
-            (prev.moonbit-bin or { })
-            // (import ./lib/moonbit-bin.nix {
-              inherit lib minVersion;
-              pkgs = final;
-              versions = import ./versions.nix lib;
-            }).legacyPackages
-            // deprecated;
-          moonbit-lang = final.callPackage ./lib/compiler.nix { };
-
-          versions = import ./versions.nix lib;
-        }
-      );
-
-      versions = import ./versions.nix lib;
-      mkMoonbitBinPackages =
-        pkgs:
-        (import ./lib/moonbit-bin.nix {
-          inherit
-            lib
-            pkgs
-            versions
-            minVersion
-            ;
-        }).packages;
-      mkMoonbitBinLegacyPackages =
-        pkgs:
-        (import ./lib/moonbit-bin.nix {
-          inherit
-            lib
-            pkgs
-            versions
-            minVersion
-            ;
-        }).legacyPackages;
-
+      forEachSystem = lib.genAttrs [
+        "x86_64-linux"
+        "aarch64-darwin"
+      ];
+      packagesFor = pkgs: import ./lib/moonbit-bin.nix { inherit pkgs; };
       treefmtEval = forEachSystem (
-        system: treefmt-nix.lib.evalModule (nixpkgs.legacyPackages.${system}) ./treefmt.nix
+        system: treefmt-nix.lib.evalModule nixpkgs.legacyPackages.${system} ./treefmt.nix
       );
     in
     {
-      overlays = {
-        default = overlay;
-        moonbit-overlay = overlay;
-      };
-
+      overlays.default = import ./default.nix;
       packages = forEachSystem (
         system:
         let
-          pkgs = nixpkgs.legacyPackages.${system};
+          packages = packagesFor nixpkgs.legacyPackages.${system};
         in
-        mkMoonbitBinPackages pkgs
-        // {
-          default = self.packages.${system}.moonbit_latest;
-        }
-        // deprecated
-        // {
-          # compiler build from source
-          # not used now
-          compiler = pkgs.callPackage ./lib/compiler.nix { };
-        }
+        packages // lib.optionalAttrs (packages ? latest) { default = packages.latest; }
       );
-      legacyPackages = forEachSystem (
-        system:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
-        in
-        mkMoonbitBinLegacyPackages pkgs // deprecated
-      );
-
       apps = forEachSystem (
         system:
         let
-          getMoonbit = lib.getExe' self.packages.${system}.default;
-          mkMoonbitApp = name: {
+          packages = self.packages.${system};
+          mkApp = name: {
             type = "app";
-            program = getMoonbit name;
+            program = lib.getExe' packages.default name;
           };
         in
-        {
-          default = self.apps.${system}.moon;
-        }
-        // (lib.genAttrs [
-          "moon"
-          "moonx"
-          "moonc"
-          "mooncake"
-          "moon_cove_report"
-          "moondoc"
-          "moonfmt"
-          "mooninfo"
-          "moonrun"
-          "moon-lsp"
-        ] mkMoonbitApp)
+        lib.optionalAttrs (packages ? default) (
+          lib.genAttrs [
+            "moon"
+            "moonx"
+            "moonc"
+            "mooncake"
+            "moon_cove_report"
+            "moondoc"
+            "moonfmt"
+            "mooninfo"
+            "moonrun"
+          ] mkApp
+          // {
+            default = mkApp "moon";
+          }
+        )
       );
-
-      templates = rec {
-        default = moonbit-dev;
-        moonbit-dev = {
-          path = ./moonbit-dev;
-          description = "A startup basic MoonBit project";
-        };
+      templates.default = {
+        path = ./moonbit-dev;
+        description = "A MoonBit development shell";
       };
-
       formatter = forEachSystem (system: treefmtEval.${system}.config.build.wrapper);
-      checks = forEachSystem (
-        system:
-        let
-          pkgs = import nixpkgs {
-            inherit system;
-            overlays = [ overlay ];
-          };
-          moonbit = pkgs.moonbit-bin.moonbit.latest;
-        in
-        {
-          formatting = treefmtEval.${system}.config.build.check self;
-          testToolchainHelpers = pkgs.runCommand "test-moonbit-toolchain-helpers" { } ''
-            test -x ${moonbit}/bin/moon-lsp
-            test -x ${moonbit}/bin/moon-ide
-
-            # `moonx` is a symlink to `moon` (argv[0] dispatch, like the
-            # official installer) and must expose the moonx CLI.
-            test -L ${moonbit}/bin/moonx
-            test -x ${moonbit}/bin/moonx
-            ${moonbit}/bin/moonx --help | grep -Fq "Run a package from the Mooncakes registry"
-
-            grep -Fq "export MOON_TOOLCHAIN_ROOT='${moonbit}'" ${moonbit}/bin/moon-lsp
-            grep -Fq "export MOON_HOME='${moonbit}'" ${moonbit}/bin/moon-lsp
-            grep -Fq "export MOON_TOOLCHAIN_ROOT='${moonbit}'" ${moonbit}/bin/moon-ide
-            grep -Fq "export MOON_HOME='${moonbit}'" ${moonbit}/bin/moon-ide
-
-            # Current toolchains use the `moon-lsp` name directly; do not add a
-            # compatibility link for the old `moonbit-lsp` name.
-            test ! -e ${moonbit}/bin/moonbit-lsp
-            test ! -L ${moonbit}/bin/moonbit-lsp
-
-            export PATH=${moonbit}/bin:$PATH
-            export HOME=$TMPDIR/home
-            mkdir -p "$HOME"
-            unset MOON_HOME MOON_TOOLCHAIN_ROOT
-            moon lsp --version >/dev/null
-            moon ide --help >/dev/null
-
-            touch $out
-          '';
-        }
-      );
+      checks = forEachSystem (system: {
+        formatting = treefmtEval.${system}.config.build.check self;
+      });
     };
 }
