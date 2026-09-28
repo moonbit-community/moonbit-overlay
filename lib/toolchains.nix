@@ -56,8 +56,8 @@ stdenv.mkDerivation {
   '';
 
   meta = {
-    homepage = "moonbitlang.com";
-    description = "TODO";
+    homepage = "https://www.moonbitlang.com";
+    description = "MoonBit binary toolchain";
     mainProgram = "moon";
   };
 }
