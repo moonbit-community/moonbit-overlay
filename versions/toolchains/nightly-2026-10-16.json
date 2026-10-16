@@ -1,0 +1,6 @@
+{
+  "version": "nightly-2026-10-16",
+  "coreHash": "sha256-R1jD5cwL9vm+qIMS+TxCp24w8TwQWpkXwuGUaWeB/M4=",
+  "linux-x86_64-toolchainsHash": "sha256-A3KJg81nE9Trdn04LUea0MMhXbH4upo2dtTKAB72VH8=",
+  "darwin-aarch64-toolchainsHash": "sha256-guexGlZMN2uVSxLMdXXiGPqDEO0k3AgzjlFMdnwuTO4="
+}
