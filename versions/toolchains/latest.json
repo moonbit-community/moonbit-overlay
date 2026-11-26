@@ -1,8 +1,8 @@
 {
-  "version": "v0.10.22+124d61d05+738607b",
-  "coreHash": "sha256-oil389NG5KGJ/lIbLSZbL7tsAOP/gDQiRvtvjybJ8VY=",
-  "linux-x86_64-toolchainsHash": "sha256-rreN7R1eJRhe14gyjKzvXoQ6mrkjFFUjt2UujQgvdPs=",
-  "darwin-aarch64-toolchainsHash": "sha256-XFcCXw20qQJh7r64gOVCADza4FAzuVBiM+KCWG+BMpo=",
+  "version": "v1.0.0-rc1+3c0520448+ccd306a",
+  "coreHash": "sha256-o/fYLxGV4orZqte5uLTLykkMv4FGswajduo766QXN1E=",
+  "linux-x86_64-toolchainsHash": "sha256-ETUnqQN/4S5GPmrB52mBFr9wNzAkMJYyjkrH4ndDB8A=",
+  "darwin-aarch64-toolchainsHash": "sha256-wNlu+6iLpA9ZwOCPuX3UqKROCcF1kVNoF66khzNROUo=",
   "moonRev": "c9ac7ee",
   "moonHash": "sha256-AcadNERJZE/nLliRM9GssMk9sOIX2BznGNeHgwJiMlg="
 }
